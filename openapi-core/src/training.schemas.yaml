@@ -1,0 +1,68 @@
+openapi: 3.1.0
+info:
+  title: jobops - Training Schemas
+  version: 1.0.0
+  x-domain: trn
+  license:
+    name: MIT
+    identifier: MIT
+paths: {}
+servers:
+  - url: https://api.jobops.dev
+components:
+  schemas:
+    Course:
+      type: object
+      required: [id, title]
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        provider:
+          type: string
+        url:
+          type: string
+          format: uri
+    Project:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+    Recommendation:
+      type: object
+      required: [type, id, reason]
+      properties:
+        type:
+          type: string
+          enum: [Course, Project]
+        id:
+          type: string
+        reason:
+          type: string
+    CourseListResponse:
+      type: object
+      properties:
+        courses:
+          type: array
+          items:
+            $ref: "#/components/schemas/Course"
+    ProjectListResponse:
+      type: object
+      properties:
+        projects:
+          type: array
+          items:
+            $ref: "#/components/schemas/Project"
+    RecommendationListResponse:
+      type: object
+      properties:
+        recommendations:
+          type: array
+          items:
+            $ref: "#/components/schemas/Recommendation"

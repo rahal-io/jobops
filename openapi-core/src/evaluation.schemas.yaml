@@ -1,0 +1,44 @@
+openapi: 3.1.0
+info:
+  title: jobops - Evaluation Schemas
+  version: 1.0.0
+  x-domain: eval
+  description: Job fit scoring (multi-dimensional / A–F grade).
+  license:
+    name: MIT
+    identifier: MIT
+paths: {}
+servers:
+  - url: https://api.jobops.dev
+components:
+  schemas:
+    DimensionScore:
+      type: object
+      required: [dimension, grade]
+      properties:
+        dimension:
+          type: string
+          example: RoleMatch
+        grade:
+          type: string
+          description: Letter grade for this dimension
+          example: B
+        score:
+          type: number
+          format: float
+    JobEvaluation:
+      type: object
+      required: [jobId, overallGrade]
+      properties:
+        jobId:
+          type: string
+        overallGrade:
+          type: string
+          example: B
+        dimensions:
+          type: array
+          items:
+            $ref: "#/components/schemas/DimensionScore"
+        filteredOut:
+          type: boolean
+          description: True when score is below user threshold

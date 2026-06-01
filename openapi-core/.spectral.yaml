@@ -1,0 +1,7 @@
+extends: ["spectral:oas"]
+
+rules:
+  info-license: error
+  operation-operationId: error
+  path-params: error
+  oas3-schema: error

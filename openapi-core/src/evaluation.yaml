@@ -1,0 +1,78 @@
+openapi: 3.1.0
+info:
+  title: jobops - Job Evaluation
+  version: 1.0.0
+  x-domain: eval
+  x-cli-modes: [oferta, ofertas, batch]
+  description: Score and rank job listings against the user profile (10D / A–F fit model).
+  license:
+    name: MIT
+    identifier: MIT
+servers:
+  - url: https://api.jobops.dev
+security:
+  - bearerAuth: []
+paths:
+  /evaluation/jobs/{jobId}:
+    post:
+      operationId: CreateEvaluationForJob
+      summary: Evaluate job fit for a listing
+      tags: [Evaluation]
+      parameters:
+        - $ref: "#/components/parameters/JobId"
+      responses:
+        "200":
+          description: Evaluation result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobEvaluation"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /evaluation/jobs/{jobId}/reevaluate:
+    post:
+      operationId: ReevaluateJob
+      summary: Re-run evaluation after profile or goals change
+      tags: [Evaluation]
+      parameters:
+        - $ref: "#/components/parameters/JobId"
+      responses:
+        "200":
+          description: Updated evaluation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobEvaluation"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+components:
+  schemas:
+    JobEvaluation:
+      $ref: "evaluation.schemas.yaml#/components/schemas/JobEvaluation"
+  parameters:
+    JobId:
+      $ref: "common/parameters.yaml#/components/parameters/JobId"
+  securitySchemes:
+    bearerAuth:
+      $ref: "common/security.yaml#/components/securitySchemes/bearerAuth"
+  responses:
+    BadRequest:
+      $ref: "common/responses.yaml#/components/responses/BadRequest"
+    Unauthorized:
+      $ref: "common/responses.yaml#/components/responses/Unauthorized"
+    Forbidden:
+      $ref: "common/responses.yaml#/components/responses/Forbidden"
+    NotFound:
+      $ref: "common/responses.yaml#/components/responses/NotFound"

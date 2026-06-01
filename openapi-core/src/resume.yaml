@@ -1,0 +1,106 @@
+openapi: 3.1.0
+info:
+  title: jobops - Resume Management
+  version: 1.0.0
+  x-domain: res
+  x-cli-modes: [pdf]
+  description: ATS-optimized resume generation and PDF export.
+  license:
+    name: MIT
+    identifier: MIT
+servers:
+  - url: https://api.jobops.dev
+security:
+  - bearerAuth: []
+paths:
+  /resumes:
+    get:
+      operationId: ListResumes
+      summary: List user resumes
+      tags: [Resume]
+      responses:
+        "200":
+          description: Resumes
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResumeListResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    post:
+      operationId: GenerateResume
+      summary: Generate a tailored resume
+      tags: [Resume]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GenerateResumeRequest"
+      responses:
+        "201":
+          description: Resume generated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Resume"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /resumes/{resumeId}/pdf:
+    get:
+      operationId: GetResumePdf
+      summary: Download resume as PDF
+      tags: [Resume]
+      parameters:
+        - $ref: "#/components/parameters/ResumeId"
+      responses:
+        "200":
+          description: PDF document
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+components:
+  schemas:
+    Resume:
+      $ref: "resume.schemas.yaml#/components/schemas/Resume"
+    ResumeListResponse:
+      $ref: "resume.schemas.yaml#/components/schemas/ResumeListResponse"
+    GenerateResumeRequest:
+      $ref: "resume.schemas.yaml#/components/schemas/GenerateResumeRequest"
+  parameters:
+    ResumeId:
+      $ref: "common/parameters.yaml#/components/parameters/ResumeId"
+  securitySchemes:
+    bearerAuth:
+      $ref: "common/security.yaml#/components/securitySchemes/bearerAuth"
+  responses:
+    BadRequest:
+      $ref: "common/responses.yaml#/components/responses/BadRequest"
+    Unauthorized:
+      $ref: "common/responses.yaml#/components/responses/Unauthorized"
+    Forbidden:
+      $ref: "common/responses.yaml#/components/responses/Forbidden"
+    NotFound:
+      $ref: "common/responses.yaml#/components/responses/NotFound"

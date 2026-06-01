@@ -1,0 +1,127 @@
+openapi: 3.1.0
+info:
+  title: jobops - User Profile
+  version: 1.0.0
+  x-domain: prf
+  x-cli-modes: [update]
+  description: User identity, profile data, and job-search preferences.
+  license:
+    name: MIT
+    identifier: MIT
+servers:
+  - url: https://api.jobops.dev
+security:
+  - bearerAuth: []
+paths:
+  /profile:
+    get:
+      operationId: GetUserProfile
+      summary: Get current user profile
+      tags: [Profile]
+      responses:
+        "200":
+          description: Profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      operationId: UpdateUserProfile
+      summary: Update user profile
+      tags: [Profile]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateProfileRequest"
+      responses:
+        "200":
+          description: Updated profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /profile/preferences:
+    get:
+      operationId: GetUserPreferences
+      summary: Get job-search preferences
+      tags: [Profile]
+      responses:
+        "200":
+          description: Preferences
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserPreferences"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      operationId: UpdateUserPreferences
+      summary: Update preferences
+      tags: [Profile]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdatePreferencesRequest"
+      responses:
+        "200":
+          description: Updated preferences
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserPreferences"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+components:
+  schemas:
+    UserProfile:
+      $ref: "profile.schemas.yaml#/components/schemas/UserProfile"
+    UserPreferences:
+      $ref: "profile.schemas.yaml#/components/schemas/UserPreferences"
+    UpdateProfileRequest:
+      $ref: "profile.schemas.yaml#/components/schemas/UpdateProfileRequest"
+    UpdatePreferencesRequest:
+      $ref: "profile.schemas.yaml#/components/schemas/UpdatePreferencesRequest"
+  securitySchemes:
+    bearerAuth:
+      $ref: "common/security.yaml#/components/securitySchemes/bearerAuth"
+  responses:
+    BadRequest:
+      $ref: "common/responses.yaml#/components/responses/BadRequest"
+    Unauthorized:
+      $ref: "common/responses.yaml#/components/responses/Unauthorized"
+    Forbidden:
+      $ref: "common/responses.yaml#/components/responses/Forbidden"
+    NotFound:
+      $ref: "common/responses.yaml#/components/responses/NotFound"

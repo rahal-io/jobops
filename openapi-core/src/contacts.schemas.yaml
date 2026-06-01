@@ -1,0 +1,57 @@
+openapi: 3.1.0
+info:
+  title: jobops - Contacts Schemas
+  version: 1.0.0
+  x-domain: con
+  license:
+    name: MIT
+    identifier: MIT
+paths: {}
+servers:
+  - url: https://api.jobops.dev
+components:
+  schemas:
+    ContactChannel:
+      type: string
+      enum: [LinkedIn, Email, Phone]
+    Contact:
+      type: object
+      required: [id, name, channel]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        role:
+          type: string
+        company:
+          type: string
+        channel:
+          $ref: "#/components/schemas/ContactChannel"
+    ContactListResponse:
+      type: object
+      properties:
+        contacts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Contact"
+    CreateContactRequest:
+      type: object
+      required: [name, channel]
+      properties:
+        name:
+          type: string
+        role:
+          type: string
+        company:
+          type: string
+        channel:
+          $ref: "#/components/schemas/ContactChannel"
+    OutreachMessage:
+      type: object
+      required: [contactId, content]
+      properties:
+        contactId:
+          type: string
+        content:
+          type: string

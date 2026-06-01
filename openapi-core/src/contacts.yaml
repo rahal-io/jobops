@@ -1,0 +1,104 @@
+openapi: 3.1.0
+info:
+  title: jobops - Contacts & Outreach
+  version: 1.0.0
+  x-domain: con
+  x-cli-modes: [contacto, followup]
+  description: Professional contacts and outreach messaging.
+  license:
+    name: MIT
+    identifier: MIT
+servers:
+  - url: https://api.jobops.dev
+security:
+  - bearerAuth: []
+paths:
+  /contacts:
+    get:
+      operationId: ListContacts
+      summary: List contacts
+      tags: [Contacts]
+      responses:
+        "200":
+          description: Contacts
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ContactListResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    post:
+      operationId: CreateContact
+      summary: Add a contact
+      tags: [Contacts]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateContactRequest"
+      responses:
+        "201":
+          description: Contact created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Contact"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /contacts/messages/send:
+    post:
+      operationId: SendOutreachMessage
+      summary: Send outreach message to a contact
+      tags: [Contacts]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OutreachMessage"
+      responses:
+        "202":
+          description: Message queued
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+components:
+  schemas:
+    Contact:
+      $ref: "contacts.schemas.yaml#/components/schemas/Contact"
+    ContactListResponse:
+      $ref: "contacts.schemas.yaml#/components/schemas/ContactListResponse"
+    CreateContactRequest:
+      $ref: "contacts.schemas.yaml#/components/schemas/CreateContactRequest"
+    OutreachMessage:
+      $ref: "contacts.schemas.yaml#/components/schemas/OutreachMessage"
+  securitySchemes:
+    bearerAuth:
+      $ref: "common/security.yaml#/components/securitySchemes/bearerAuth"
+  responses:
+    BadRequest:
+      $ref: "common/responses.yaml#/components/responses/BadRequest"
+    Unauthorized:
+      $ref: "common/responses.yaml#/components/responses/Unauthorized"
+    Forbidden:
+      $ref: "common/responses.yaml#/components/responses/Forbidden"
+    NotFound:
+      $ref: "common/responses.yaml#/components/responses/NotFound"

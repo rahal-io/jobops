@@ -1,0 +1,114 @@
+openapi: 3.1.0
+info:
+  title: jobops - Opportunity Discovery
+  version: 1.0.0
+  x-domain: disc
+  x-cli-modes: [scan, batch, ofertas]
+  description: |
+    Discover and aggregate job postings from portals and boards.
+    Produces `JobsDiscovered` / `SearchCompleted` domain events.
+  license:
+    name: MIT
+    identifier: MIT
+servers:
+  - url: https://api.jobops.dev
+security:
+  - bearerAuth: []
+paths:
+  /discovery/jobs/search:
+    post:
+      operationId: CreateDiscoveryJobSearch
+      summary: Search for jobs by criteria
+      tags: [Discovery]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SearchRequest"
+      responses:
+        "200":
+          description: Matching job postings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobListResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /discovery/jobs/search/{queryId}:
+    get:
+      operationId: GetDiscoveryJobSearch
+      summary: Get async search status and results
+      tags: [Discovery]
+      parameters:
+        - $ref: "#/components/parameters/QueryId"
+      responses:
+        "200":
+          description: Search job status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobSearch"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /discovery/jobs/{jobId}:
+    get:
+      operationId: GetDiscoveryJobPosting
+      summary: Retrieve a single job posting
+      tags: [Discovery]
+      parameters:
+        - $ref: "#/components/parameters/JobId"
+      responses:
+        "200":
+          description: Job posting
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobPosting"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+components:
+  schemas:
+    SearchRequest:
+      $ref: "discovery.schemas.yaml#/components/schemas/SearchRequest"
+    JobPosting:
+      $ref: "discovery.schemas.yaml#/components/schemas/JobPosting"
+    JobListResponse:
+      $ref: "discovery.schemas.yaml#/components/schemas/JobListResponse"
+    JobSearch:
+      $ref: "discovery.schemas.yaml#/components/schemas/JobSearch"
+  parameters:
+    JobId:
+      $ref: "common/parameters.yaml#/components/parameters/JobId"
+    QueryId:
+      $ref: "common/parameters.yaml#/components/parameters/QueryId"
+  securitySchemes:
+    bearerAuth:
+      $ref: "common/security.yaml#/components/securitySchemes/bearerAuth"
+  responses:
+    BadRequest:
+      $ref: "common/responses.yaml#/components/responses/BadRequest"
+    Unauthorized:
+      $ref: "common/responses.yaml#/components/responses/Unauthorized"
+    Forbidden:
+      $ref: "common/responses.yaml#/components/responses/Forbidden"
+    NotFound:
+      $ref: "common/responses.yaml#/components/responses/NotFound"

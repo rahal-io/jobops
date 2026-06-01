@@ -1,0 +1,63 @@
+openapi: 3.1.0
+info:
+  title: jobops - Strategy Schemas
+  version: 1.0.0
+  x-domain: str
+  license:
+    name: MIT
+    identifier: MIT
+paths: {}
+servers:
+  - url: https://api.jobops.dev
+components:
+  schemas:
+    NorthStar:
+      type: object
+      required: [archetype]
+      properties:
+        archetype:
+          type: string
+          description: Career archetype that guides scoring and CV narrative
+          example: Agentic Workflows
+        summary:
+          type: string
+    CareerGoal:
+      type: object
+      required: [id, title]
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        targetDate:
+          type: string
+          format: date
+        status:
+          type: string
+          enum: [Active, Achieved, Paused]
+    CareerStrategy:
+      type: object
+      properties:
+        northStar:
+          $ref: "#/components/schemas/NorthStar"
+        goals:
+          type: array
+          items:
+            $ref: "#/components/schemas/CareerGoal"
+    UpdateNorthStarRequest:
+      type: object
+      required: [archetype]
+      properties:
+        archetype:
+          type: string
+        summary:
+          type: string
+    CreateCareerGoalRequest:
+      type: object
+      required: [title]
+      properties:
+        title:
+          type: string
+        targetDate:
+          type: string
+          format: date

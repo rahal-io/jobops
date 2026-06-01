@@ -1,0 +1,45 @@
+openapi: 3.1.0
+info:
+  title: jobops - Platform Schemas
+  version: 1.0.0
+  x-domain: plt
+  license:
+    name: MIT
+    identifier: MIT
+paths: {}
+servers:
+  - url: https://api.jobops.dev
+components:
+  schemas:
+    HealthResponse:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [ok, degraded]
+        version:
+          type: string
+    BoundedContextInfo:
+      type: object
+      required: [name, domain, spec]
+      properties:
+        name:
+          type: string
+        domain:
+          type: string
+          description: Short domain prefix (disc, app, …)
+        spec:
+          type: string
+          description: OpenAPI path spec filename
+        cliModes:
+          type: array
+          items:
+            type: string
+    ContextListResponse:
+      type: object
+      properties:
+        contexts:
+          type: array
+          items:
+            $ref: "#/components/schemas/BoundedContextInfo"

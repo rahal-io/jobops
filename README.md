@@ -74,11 +74,19 @@ Example invocations (from design): `/jobops scan`, `/jobops apply`, `/jobops int
 - **Service boundaries** — One deployable or module per bounded context; database-per-service where possible.
 - **Integration** — Async domain events (e.g. `JobFound`, `JobEvaluated`, `ApplicationSubmitted`, `ResumeGenerated`) plus REST/OpenAPI for on-demand queries; AsyncAPI for event contracts.
 - **AI agents** — Scoped to a single context (evaluation, form fill, interview coach, etc.); outputs validated before pipeline updates where needed.
-- **APIs** — OpenAPI 3.1 skeletons per context in [`domain-models.md`](.design/domain-models.md) (discovery, applications, resumes, companies, interview, contacts, training, offers, analytics).
+- **APIs** — OpenAPI 3.1 specs in [`openapi-core/src/`](openapi-core/src/) (one spec pair per bounded context); originated from [`.design/domain-models.md`](.design/domain-models.md).
+
+## Repository layout
+
+| Path | Purpose |
+|------|---------|
+| [`.design/`](.design/) | DDD context map, domain models, CLI mode mapping |
+| [`openapi-core/`](openapi-core/) | OpenAPI 3.1 specs per bounded context (see [`openapi-core/README.md`](openapi-core/README.md)) |
+| [`EXAMPLE_openapi-core/`](EXAMPLE_openapi-core/) | Reference layout for spec authoring (upstream template) |
 
 ## Status
 
-This repository currently holds **domain design and context mapping** only. Implementation (services, agents, CLI) is not yet present in the tree.
+**Design and API contracts** are in place under `.design/` and `openapi-core/`. Runtime implementation (services, agents, CLI) is not yet present.
 
 ## License
 

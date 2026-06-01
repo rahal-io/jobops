@@ -1,0 +1,73 @@
+openapi: 3.1.0
+info:
+  title: jobops - Analytics & Insights
+  version: 1.0.0
+  x-domain: anl
+  x-cli-modes: [patterns]
+  description: Rejection patterns, pipeline metrics, and career progression insights.
+  license:
+    name: MIT
+    identifier: MIT
+servers:
+  - url: https://api.jobops.dev
+security:
+  - bearerAuth: []
+paths:
+  /analytics/rejections:
+    get:
+      operationId: ListRejectionPatterns
+      summary: Analyze rejection patterns
+      tags: [Analytics]
+      responses:
+        "200":
+          description: Patterns
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PatternListResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /analytics/progression:
+    get:
+      operationId: GetCareerProgression
+      summary: Get career progression metrics
+      tags: [Analytics]
+      responses:
+        "200":
+          description: Progress report
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProgressReport"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+components:
+  schemas:
+    PatternListResponse:
+      $ref: "analytics.schemas.yaml#/components/schemas/PatternListResponse"
+    ProgressReport:
+      $ref: "analytics.schemas.yaml#/components/schemas/ProgressReport"
+  securitySchemes:
+    bearerAuth:
+      $ref: "common/security.yaml#/components/securitySchemes/bearerAuth"
+  responses:
+    BadRequest:
+      $ref: "common/responses.yaml#/components/responses/BadRequest"
+    Unauthorized:
+      $ref: "common/responses.yaml#/components/responses/Unauthorized"
+    Forbidden:
+      $ref: "common/responses.yaml#/components/responses/Forbidden"
+    NotFound:
+      $ref: "common/responses.yaml#/components/responses/NotFound"

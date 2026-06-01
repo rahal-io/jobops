@@ -1,0 +1,51 @@
+openapi: 3.1.0
+info:
+  title: jobops - Company Schemas
+  version: 1.0.0
+  x-domain: co
+  license:
+    name: MIT
+    identifier: MIT
+paths: {}
+servers:
+  - url: https://api.jobops.dev
+components:
+  schemas:
+    CompanyProfile:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        rating:
+          type: number
+        industry:
+          type: string
+        website:
+          type: string
+          format: uri
+    NewsArticle:
+      type: object
+      required: [title, url]
+      properties:
+        title:
+          type: string
+        summary:
+          type: string
+        url:
+          type: string
+          format: uri
+        publishedDate:
+          type: string
+          format: date
+    NewsListResponse:
+      type: object
+      properties:
+        articles:
+          type: array
+          items:
+            $ref: "#/components/schemas/NewsArticle"

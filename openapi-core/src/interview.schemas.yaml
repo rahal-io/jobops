@@ -1,0 +1,65 @@
+openapi: 3.1.0
+info:
+  title: jobops - Interview Schemas
+  version: 1.0.0
+  x-domain: int
+  license:
+    name: MIT
+    identifier: MIT
+paths: {}
+servers:
+  - url: https://api.jobops.dev
+components:
+  schemas:
+    InterviewQuestion:
+      type: object
+      required: [id, text]
+      properties:
+        id:
+          type: string
+        text:
+          type: string
+        topic:
+          type: string
+    QuestionListResponse:
+      type: object
+      properties:
+        questions:
+          type: array
+          items:
+            $ref: "#/components/schemas/InterviewQuestion"
+    InterviewSession:
+      type: object
+      required: [sessionId, status]
+      properties:
+        sessionId:
+          type: string
+        status:
+          type: string
+          enum: [Active, Completed]
+    StarStory:
+      type: object
+      properties:
+        id:
+          type: string
+        situation:
+          type: string
+        task:
+          type: string
+        action:
+          type: string
+        result:
+          type: string
+        reflection:
+          type: string
+        skills:
+          type: array
+          items:
+            type: string
+    StoryListResponse:
+      type: object
+      properties:
+        stories:
+          type: array
+          items:
+            $ref: "#/components/schemas/StarStory"

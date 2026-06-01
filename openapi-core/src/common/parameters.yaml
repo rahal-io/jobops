@@ -1,0 +1,63 @@
+openapi: 3.1.0
+info:
+  title: jobops - Common Parameters
+  version: 1.0.0
+  license:
+    name: MIT
+    identifier: MIT
+servers:
+  - url: https://api.jobops.dev
+paths: {}
+components:
+  parameters:
+    JobId:
+      in: path
+      name: jobId
+      required: true
+      schema:
+        type: string
+    AppId:
+      in: path
+      name: appId
+      required: true
+      schema:
+        type: string
+    CompanyId:
+      in: path
+      name: companyId
+      required: true
+      schema:
+        type: string
+    QueryId:
+      in: path
+      name: queryId
+      required: true
+      schema:
+        type: string
+    ResumeId:
+      in: path
+      name: resumeId
+      required: true
+      schema:
+        type: string
+    ContactId:
+      in: path
+      name: contactId
+      required: true
+      schema:
+        type: string
+    Cursor:
+      in: query
+      name: cursor
+      required: false
+      schema:
+        type: string
+    Limit:
+      in: query
+      name: limit
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20

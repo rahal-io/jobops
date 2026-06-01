@@ -1,0 +1,101 @@
+openapi: 3.1.0
+info:
+  title: jobops - Interview Preparation
+  version: 1.0.0
+  x-domain: int
+  x-cli-modes: [interview-prep]
+  description: Mock interviews, question lists, and STAR story bank.
+  license:
+    name: MIT
+    identifier: MIT
+servers:
+  - url: https://api.jobops.dev
+security:
+  - bearerAuth: []
+paths:
+  /interview/questions:
+    get:
+      operationId: ListInterviewQuestions
+      summary: Get practice questions for a job
+      tags: [Interview]
+      parameters:
+        - name: jobId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Questions
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QuestionListResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /interview/sessions:
+    post:
+      operationId: StartInterviewSession
+      summary: Start a practice interview session
+      tags: [Interview]
+      responses:
+        "200":
+          description: Session started
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InterviewSession"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /interview/stories:
+    get:
+      operationId: ListInterviewStories
+      summary: List STAR stories in the story bank
+      tags: [Interview]
+      responses:
+        "200":
+          description: Stories
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StoryListResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+components:
+  schemas:
+    QuestionListResponse:
+      $ref: "interview.schemas.yaml#/components/schemas/QuestionListResponse"
+    InterviewSession:
+      $ref: "interview.schemas.yaml#/components/schemas/InterviewSession"
+    StoryListResponse:
+      $ref: "interview.schemas.yaml#/components/schemas/StoryListResponse"
+  securitySchemes:
+    bearerAuth:
+      $ref: "common/security.yaml#/components/securitySchemes/bearerAuth"
+  responses:
+    BadRequest:
+      $ref: "common/responses.yaml#/components/responses/BadRequest"
+    Unauthorized:
+      $ref: "common/responses.yaml#/components/responses/Unauthorized"
+    Forbidden:
+      $ref: "common/responses.yaml#/components/responses/Forbidden"
+    NotFound:
+      $ref: "common/responses.yaml#/components/responses/NotFound"

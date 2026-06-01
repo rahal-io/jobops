@@ -1,0 +1,59 @@
+openapi: 3.1.0
+info:
+  title: jobops - Offer Evaluation
+  version: 1.0.0
+  x-domain: off
+  x-cli-modes: [oferta]
+  description: Score and compare compensation packages for received offers.
+  license:
+    name: MIT
+    identifier: MIT
+servers:
+  - url: https://api.jobops.dev
+security:
+  - bearerAuth: []
+paths:
+  /offers/evaluate:
+    post:
+      operationId: EvaluateOffer
+      summary: Evaluate a job offer package
+      tags: [Offer]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OfferEvaluationRequest"
+      responses:
+        "200":
+          description: Offer score
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OfferScore"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+components:
+  schemas:
+    OfferEvaluationRequest:
+      $ref: "offer.schemas.yaml#/components/schemas/OfferEvaluationRequest"
+    OfferScore:
+      $ref: "offer.schemas.yaml#/components/schemas/OfferScore"
+  securitySchemes:
+    bearerAuth:
+      $ref: "common/security.yaml#/components/securitySchemes/bearerAuth"
+  responses:
+    BadRequest:
+      $ref: "common/responses.yaml#/components/responses/BadRequest"
+    Unauthorized:
+      $ref: "common/responses.yaml#/components/responses/Unauthorized"
+    Forbidden:
+      $ref: "common/responses.yaml#/components/responses/Forbidden"
+    NotFound:
+      $ref: "common/responses.yaml#/components/responses/NotFound"

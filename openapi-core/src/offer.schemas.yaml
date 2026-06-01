@@ -1,0 +1,39 @@
+openapi: 3.1.0
+info:
+  title: jobops - Offer Schemas
+  version: 1.0.0
+  x-domain: off
+  license:
+    name: MIT
+    identifier: MIT
+paths: {}
+servers:
+  - url: https://api.jobops.dev
+components:
+  schemas:
+    OfferEvaluationRequest:
+      type: object
+      required: [baseSalary]
+      properties:
+        baseSalary:
+          type: number
+        bonus:
+          type: number
+        equityValue:
+          type: number
+        benefits:
+          type: array
+          items:
+            type: string
+        location:
+          type: string
+    OfferScore:
+      type: object
+      required: [score]
+      properties:
+        score:
+          type: string
+          description: Overall grade A–F
+        breakdown:
+          type: object
+          additionalProperties: true

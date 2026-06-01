@@ -1,0 +1,36 @@
+openapi: 3.1.0
+info:
+  title: jobops - Analytics Schemas
+  version: 1.0.0
+  x-domain: anl
+  license:
+    name: MIT
+    identifier: MIT
+paths: {}
+servers:
+  - url: https://api.jobops.dev
+components:
+  schemas:
+    PatternReport:
+      type: object
+      required: [pattern, count]
+      properties:
+        pattern:
+          type: string
+        count:
+          type: integer
+    PatternListResponse:
+      type: object
+      properties:
+        patterns:
+          type: array
+          items:
+            $ref: "#/components/schemas/PatternReport"
+    ProgressReport:
+      type: object
+      required: [metric, value]
+      properties:
+        metric:
+          type: string
+        value:
+          type: number

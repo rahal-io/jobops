@@ -1,0 +1,79 @@
+openapi: 3.1.0
+info:
+  title: jobops - Discovery Schemas
+  version: 1.0.0
+  x-domain: disc
+  description: Schemas for Opportunity Discovery (job postings, search).
+  license:
+    name: MIT
+    identifier: MIT
+paths: {}
+servers:
+  - url: https://api.jobops.dev
+components:
+  schemas:
+    SalaryRange:
+      type: object
+      properties:
+        min:
+          type: integer
+          example: 50000
+        max:
+          type: integer
+          example: 100000
+    SearchRequest:
+      type: object
+      required: [keywords]
+      properties:
+        keywords:
+          type: array
+          items:
+            type: string
+        location:
+          type: string
+        remote:
+          type: boolean
+        salaryRange:
+          $ref: "#/components/schemas/SalaryRange"
+    JobPosting:
+      type: object
+      required: [id, title, company, location, url]
+      properties:
+        id:
+          type: string
+          example: job-123
+        title:
+          type: string
+        company:
+          type: string
+        location:
+          type: string
+        salary:
+          $ref: "#/components/schemas/SalaryRange"
+        description:
+          type: string
+        url:
+          type: string
+          format: uri
+        source:
+          type: string
+          description: Portal or board identifier
+    JobListResponse:
+      type: object
+      properties:
+        jobs:
+          type: array
+          items:
+            $ref: "#/components/schemas/JobPosting"
+    JobSearch:
+      type: object
+      properties:
+        queryId:
+          type: string
+        status:
+          type: string
+          enum: [Pending, Complete, Failed]
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/JobPosting"

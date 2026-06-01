@@ -1,0 +1,80 @@
+openapi: 3.1.0
+info:
+  title: jobops - Company Research
+  version: 1.0.0
+  x-domain: co
+  x-cli-modes: [deep]
+  description: Company profiles, ratings, and news for fit and interview prep.
+  license:
+    name: MIT
+    identifier: MIT
+servers:
+  - url: https://api.jobops.dev
+security:
+  - bearerAuth: []
+paths:
+  /companies/{companyId}/profile:
+    get:
+      operationId: GetCompanyProfile
+      summary: Fetch company profile and reviews
+      tags: [Company]
+      parameters:
+        - $ref: "#/components/parameters/CompanyId"
+      responses:
+        "200":
+          description: Company profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CompanyProfile"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /companies/{companyId}/news:
+    get:
+      operationId: ListCompanyNews
+      summary: Fetch recent news about the company
+      tags: [Company]
+      parameters:
+        - $ref: "#/components/parameters/CompanyId"
+      responses:
+        "200":
+          description: News articles
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NewsListResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+components:
+  schemas:
+    CompanyProfile:
+      $ref: "company.schemas.yaml#/components/schemas/CompanyProfile"
+    NewsListResponse:
+      $ref: "company.schemas.yaml#/components/schemas/NewsListResponse"
+  parameters:
+    CompanyId:
+      $ref: "common/parameters.yaml#/components/parameters/CompanyId"
+  securitySchemes:
+    bearerAuth:
+      $ref: "common/security.yaml#/components/securitySchemes/bearerAuth"
+  responses:
+    BadRequest:
+      $ref: "common/responses.yaml#/components/responses/BadRequest"
+    Unauthorized:
+      $ref: "common/responses.yaml#/components/responses/Unauthorized"
+    Forbidden:
+      $ref: "common/responses.yaml#/components/responses/Forbidden"
+    NotFound:
+      $ref: "common/responses.yaml#/components/responses/NotFound"

@@ -1,0 +1,16 @@
+{
+  "name": "@rahal-io/jobops-openapi",
+  "private": true,
+  "version": "0.1.0",
+  "description": "OpenAPI 3.1 specs for jobops bounded contexts",
+  "scripts": {
+    "test": "pnpm lint:domains && pnpm bundle:domains",
+    "validate": "pnpm test",
+    "lint:domains": "python3 .scripts/lint_and_bundle_from_config.py lint",
+    "bundle:domains": "python3 .scripts/lint_and_bundle_from_config.py bundle",
+    "lint:all": "pnpm -s redocly lint --config .redocly.yaml src/*.yaml"
+  },
+  "devDependencies": {
+    "@redocly/cli": "^1.34.0"
+  }
+}

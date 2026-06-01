@@ -1,0 +1,51 @@
+openapi: 3.1.0
+info:
+  title: jobops - Platform
+  version: 1.0.0
+  x-domain: plt
+  description: Cross-cutting platform endpoints (health, service catalog).
+  license:
+    name: MIT
+    identifier: MIT
+servers:
+  - url: https://api.jobops.dev
+paths:
+  /platform/health:
+    get:
+      operationId: GetPlatformHealth
+      summary: API health check
+      tags: [Platform]
+      security: []
+      responses:
+        "200":
+          description: Service health
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+  /platform/contexts:
+    get:
+      operationId: ListBoundedContexts
+      summary: List jobops bounded contexts and CLI mode mapping
+      tags: [Platform]
+      security: []
+      responses:
+        "200":
+          description: Bounded context catalog
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ContextListResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+components:
+  schemas:
+    HealthResponse:
+      $ref: "platform.schemas.yaml#/components/schemas/HealthResponse"
+    ContextListResponse:
+      $ref: "platform.schemas.yaml#/components/schemas/ContextListResponse"
+  responses:
+    BadRequest:
+      $ref: "common/responses.yaml#/components/responses/BadRequest"

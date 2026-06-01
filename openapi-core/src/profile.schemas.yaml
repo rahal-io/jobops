@@ -1,0 +1,52 @@
+openapi: 3.1.0
+info:
+  title: jobops - Profile Schemas
+  version: 1.0.0
+  x-domain: prf
+  license:
+    name: MIT
+    identifier: MIT
+paths: {}
+servers:
+  - url: https://api.jobops.dev
+components:
+  schemas:
+    UserProfile:
+      type: object
+      required: [id, email]
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+          format: email
+        displayName:
+          type: string
+        headline:
+          type: string
+    UserPreferences:
+      type: object
+      properties:
+        industries:
+          type: array
+          items:
+            type: string
+        locations:
+          type: array
+          items:
+            type: string
+        remote:
+          type: boolean
+        salaryMin:
+          type: integer
+        salaryMax:
+          type: integer
+    UpdateProfileRequest:
+      type: object
+      properties:
+        displayName:
+          type: string
+        headline:
+          type: string
+    UpdatePreferencesRequest:
+      $ref: "#/components/schemas/UserPreferences"
