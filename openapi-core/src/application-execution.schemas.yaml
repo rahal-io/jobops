@@ -20,15 +20,15 @@ components:
       enum: [text, textarea, select, checkbox, file, email, phone, url]
     FormField:
       type: object
-      required: [name, type]
+      required: [name, fieldType]
       properties:
         name:
           type: string
-        type:
+        fieldType:
           $ref: "#/components/schemas/FormFieldType"
         label:
           type: string
-        required:
+        isRequired:
           type: boolean
           default: false
         options:
@@ -134,3 +134,4 @@ components:
             $ref: "#/components/schemas/FieldAnswer"
         resumeId:
           type: string
+
