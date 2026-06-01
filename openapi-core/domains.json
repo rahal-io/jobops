@@ -2,7 +2,8 @@
   "domains": [
     { "name": "discovery", "spec_path": "discovery.yaml", "bundled_path": "discovery.json" },
     { "name": "evaluation", "spec_path": "evaluation.yaml", "bundled_path": "evaluation.json" },
-    { "name": "application", "spec_path": "application.yaml", "bundled_path": "application.json" },
+    { "name": "pipeline", "spec_path": "pipeline.yaml", "bundled_path": "pipeline.json" },
+    { "name": "application-execution", "spec_path": "application-execution.yaml", "bundled_path": "application-execution.json" },
     { "name": "resume", "spec_path": "resume.yaml", "bundled_path": "resume.json" },
     { "name": "company", "spec_path": "company.yaml", "bundled_path": "company.json" },
     { "name": "interview", "spec_path": "interview.yaml", "bundled_path": "interview.json" },
@@ -12,6 +13,7 @@
     { "name": "analytics", "spec_path": "analytics.yaml", "bundled_path": "analytics.json" },
     { "name": "profile", "spec_path": "profile.yaml", "bundled_path": "profile.json" },
     { "name": "strategy", "spec_path": "strategy.yaml", "bundled_path": "strategy.json" },
+    { "name": "ai", "spec_path": "ai.yaml", "bundled_path": "ai.json" },
     { "name": "platform", "spec_path": "platform.yaml", "bundled_path": "platform.json" }
   ]
 }

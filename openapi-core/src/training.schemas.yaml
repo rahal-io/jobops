@@ -3,6 +3,7 @@ info:
   title: jobops - Training Schemas
   version: 1.0.0
   x-domain: trn
+  description: Courses, certifications, portfolio projects, and skill tracking.
   license:
     name: MIT
     identifier: MIT
@@ -11,7 +12,22 @@ servers:
   - url: https://api.jobops.dev
 components:
   schemas:
+    SkillLevel:
+      type: string
+      enum: [beginner, intermediate, advanced, expert]
+    LearningStatus:
+      type: string
+      enum: [planned, in_progress, completed, dropped]
+    Skill:
+      type: object
+      required: [name, level]
+      properties:
+        name:
+          type: string
+        level:
+          $ref: "#/components/schemas/SkillLevel"
     Course:
+      x-entity: true
       type: object
       required: [id, title]
       properties:
@@ -24,7 +40,24 @@ components:
         url:
           type: string
           format: uri
+        status:
+          $ref: "#/components/schemas/LearningStatus"
+        startedAt:
+          type: string
+          format: date
+        completedAt:
+          type: string
+          format: date
+        completionPercent:
+          type: integer
+          minimum: 0
+          maximum: 100
+        skillsGained:
+          type: array
+          items:
+            $ref: "#/components/schemas/Skill"
     Project:
+      x-entity: true
       type: object
       required: [id, name]
       properties:
@@ -34,13 +67,71 @@ components:
           type: string
         description:
           type: string
+        status:
+          $ref: "#/components/schemas/LearningStatus"
+        startedAt:
+          type: string
+          format: date
+        completedAt:
+          type: string
+          format: date
+        skillsGained:
+          type: array
+          items:
+            $ref: "#/components/schemas/Skill"
+        url:
+          type: string
+          format: uri
+    Certification:
+      x-entity: true
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        issuer:
+          type: string
+        issuedAt:
+          type: string
+          format: date
+        expiresAt:
+          type: string
+          format: date
+        credentialUrl:
+          type: string
+          format: uri
+        skills:
+          type: array
+          items:
+            $ref: "#/components/schemas/Skill"
+    Portfolio:
+      type: object
+      properties:
+        courses:
+          type: array
+          items:
+            $ref: "#/components/schemas/Course"
+        projects:
+          type: array
+          items:
+            $ref: "#/components/schemas/Project"
+        certifications:
+          type: array
+          items:
+            $ref: "#/components/schemas/Certification"
+        skills:
+          type: array
+          items:
+            $ref: "#/components/schemas/Skill"
     Recommendation:
       type: object
       required: [type, id, reason]
       properties:
         type:
           type: string
-          enum: [Course, Project]
+          enum: [Course, Project, Certification]
         id:
           type: string
         reason:
@@ -59,6 +150,13 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Project"
+    CertificationListResponse:
+      type: object
+      properties:
+        certifications:
+          type: array
+          items:
+            $ref: "#/components/schemas/Certification"
     RecommendationListResponse:
       type: object
       properties:
@@ -66,3 +164,47 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Recommendation"
+    CreateCourseRequest:
+      type: object
+      required: [title]
+      properties:
+        title:
+          type: string
+        provider:
+          type: string
+        url:
+          type: string
+          format: uri
+        skillsGained:
+          type: array
+          items:
+            $ref: "#/components/schemas/Skill"
+    UpdateCourseRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        status:
+          $ref: "#/components/schemas/LearningStatus"
+        completionPercent:
+          type: integer
+          minimum: 0
+          maximum: 100
+        completedAt:
+          type: string
+          format: date
+    CreateProjectRequest:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        url:
+          type: string
+          format: uri
+        skillsGained:
+          type: array
+          items:
+            $ref: "#/components/schemas/Skill"

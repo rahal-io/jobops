@@ -43,3 +43,20 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/BoundedContextInfo"
+    CliModeMapping:
+      type: object
+      required: [mode, domain, spec]
+      properties:
+        mode:
+          type: string
+        domain:
+          type: string
+        spec:
+          type: string
+    CliModeListResponse:
+      type: object
+      properties:
+        modes:
+          type: array
+          items:
+            $ref: "#/components/schemas/CliModeMapping"

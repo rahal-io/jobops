@@ -44,9 +44,64 @@ paths:
       operationId: StartInterviewSession
       summary: Start a practice interview session
       tags: [Interview]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StartInterviewSessionRequest"
       responses:
         "200":
           description: Session started
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InterviewSession"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /interview/sessions/{sessionId}/answers:
+    post:
+      operationId: SubmitPracticeAnswer
+      summary: Submit an answer and receive feedback
+      tags: [Interview]
+      parameters:
+        - $ref: "#/components/parameters/SessionId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubmitPracticeAnswerRequest"
+      responses:
+        "200":
+          description: Answer recorded with feedback
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SessionAnswer"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /interview/sessions/{sessionId}/feedback:
+    get:
+      operationId: GetInterviewSessionFeedback
+      summary: Get overall session feedback
+      tags: [Interview]
+      parameters:
+        - $ref: "#/components/parameters/SessionId"
+      responses:
+        "200":
+          description: Session feedback
           content:
             application/json:
               schema:
@@ -85,8 +140,17 @@ components:
       $ref: "interview.schemas.yaml#/components/schemas/QuestionListResponse"
     InterviewSession:
       $ref: "interview.schemas.yaml#/components/schemas/InterviewSession"
+    StartInterviewSessionRequest:
+      $ref: "interview.schemas.yaml#/components/schemas/StartInterviewSessionRequest"
+    SubmitPracticeAnswerRequest:
+      $ref: "interview.schemas.yaml#/components/schemas/SubmitPracticeAnswerRequest"
+    SessionAnswer:
+      $ref: "interview.schemas.yaml#/components/schemas/SessionAnswer"
     StoryListResponse:
       $ref: "interview.schemas.yaml#/components/schemas/StoryListResponse"
+  parameters:
+    SessionId:
+      $ref: "common/parameters.yaml#/components/parameters/SessionId"
   securitySchemes:
     bearerAuth:
       $ref: "common/security.yaml#/components/securitySchemes/bearerAuth"

@@ -46,6 +46,72 @@ components:
       required: true
       schema:
         type: string
+    PromptId:
+      in: path
+      name: promptId
+      required: true
+      schema:
+        type: string
+    RunId:
+      in: path
+      name: runId
+      required: true
+      schema:
+        type: string
+    SubmissionId:
+      in: path
+      name: submissionId
+      required: true
+      schema:
+        type: string
+    EvaluationId:
+      in: path
+      name: evaluationId
+      required: true
+      schema:
+        type: string
+    OfferId:
+      in: path
+      name: offerId
+      required: true
+      schema:
+        type: string
+    SessionId:
+      in: path
+      name: sessionId
+      required: true
+      schema:
+        type: string
+    ReportId:
+      in: path
+      name: reportId
+      required: true
+      schema:
+        type: string
+    RejectionId:
+      in: path
+      name: rejectionId
+      required: true
+      schema:
+        type: string
+    SavedJobId:
+      in: path
+      name: savedJobId
+      required: true
+      schema:
+        type: string
+    BoardId:
+      in: path
+      name: boardId
+      required: true
+      schema:
+        type: string
+    ModelId:
+      in: path
+      name: modelId
+      required: true
+      schema:
+        type: string
     Cursor:
       in: query
       name: cursor

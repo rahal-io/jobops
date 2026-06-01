@@ -21,7 +21,10 @@ components:
         max:
           type: integer
           example: 100000
-    SearchRequest:
+        currency:
+          type: string
+          example: USD
+    SearchFilter:
       type: object
       required: [keywords]
       properties:
@@ -35,7 +38,45 @@ components:
           type: boolean
         salaryRange:
           $ref: "#/components/schemas/SalaryRange"
+        industries:
+          type: array
+          items:
+            type: string
+        tags:
+          type: array
+          items:
+            type: string
+    SearchRequest:
+      $ref: "#/components/schemas/SearchFilter"
+    JobBoardAdapterType:
+      type: string
+      enum: [greenhouse, lever, workday, linkedin, indeed, custom]
+    JobBoard:
+      x-entity: true
+      type: object
+      required: [id, name, baseUrl]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        baseUrl:
+          type: string
+          format: uri
+        adapterType:
+          $ref: "#/components/schemas/JobBoardAdapterType"
+        enabled:
+          type: boolean
+          default: true
+    JobBoardListResponse:
+      type: object
+      properties:
+        boards:
+          type: array
+          items:
+            $ref: "#/components/schemas/JobBoard"
     JobPosting:
+      x-entity: true
       type: object
       required: [id, title, company, location, url]
       properties:
@@ -45,6 +86,8 @@ components:
         title:
           type: string
         company:
+          type: string
+        companyId:
           type: string
         location:
           type: string
@@ -58,6 +101,14 @@ components:
         source:
           type: string
           description: Portal or board identifier
+        boardId:
+          type: string
+        industry:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
     JobListResponse:
       type: object
       properties:
@@ -73,7 +124,50 @@ components:
         status:
           type: string
           enum: [Pending, Complete, Failed]
+        filter:
+          $ref: "#/components/schemas/SearchFilter"
         results:
           type: array
           items:
             $ref: "#/components/schemas/JobPosting"
+    BatchSearchRequest:
+      type: object
+      required: [filters]
+      properties:
+        filters:
+          type: array
+          items:
+            $ref: "#/components/schemas/SearchFilter"
+        boardIds:
+          type: array
+          items:
+            type: string
+    SavedJob:
+      x-entity: true
+      type: object
+      required: [id, jobId, savedAt]
+      properties:
+        id:
+          type: string
+        jobId:
+          type: string
+        savedAt:
+          type: string
+          format: date-time
+        notes:
+          type: string
+    SaveJobRequest:
+      type: object
+      required: [jobId]
+      properties:
+        jobId:
+          type: string
+        notes:
+          type: string
+    SavedJobListResponse:
+      type: object
+      properties:
+        savedJobs:
+          type: array
+          items:
+            $ref: "#/components/schemas/SavedJob"

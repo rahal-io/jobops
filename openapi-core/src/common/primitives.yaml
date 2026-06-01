@@ -1,0 +1,40 @@
+openapi: 3.1.0
+info:
+  title: jobops - Common Primitives
+  version: 1.0.0
+  description: Shared value objects referenced across bounded contexts.
+  license:
+    name: MIT
+    identifier: MIT
+paths: {}
+servers:
+  - url: https://api.jobops.dev
+components:
+  schemas:
+    Money:
+      x-value-object: true
+      type: object
+      required: [amount, currency]
+      properties:
+        amount:
+          type: number
+        currency:
+          type: string
+          example: USD
+        period:
+          type: string
+          enum: [annual, monthly, hourly]
+    DateRange:
+      x-value-object: true
+      type: object
+      properties:
+        start:
+          type: string
+          format: date
+        end:
+          type: string
+          format: date
+    ExternalUrl:
+      x-value-object: true
+      type: string
+      format: uri

@@ -1,0 +1,136 @@
+openapi: 3.1.0
+info:
+  title: jobops - Application Execution Schemas
+  version: 1.0.0
+  x-domain: aex
+  description: Form autofill, field answers, and application submission lifecycle.
+  license:
+    name: MIT
+    identifier: MIT
+paths: {}
+servers:
+  - url: https://api.jobops.dev
+components:
+  schemas:
+    SubmissionStatus:
+      type: string
+      enum: [pending, running, succeeded, failed, cancelled]
+    FormFieldType:
+      type: string
+      enum: [text, textarea, select, checkbox, file, email, phone, url]
+    FormField:
+      type: object
+      required: [name, type]
+      properties:
+        name:
+          type: string
+        type:
+          $ref: "#/components/schemas/FormFieldType"
+        label:
+          type: string
+        required:
+          type: boolean
+          default: false
+        options:
+          type: array
+          items:
+            type: string
+    ApplicationForm:
+      type: object
+      required: [formUrl, fields]
+      properties:
+        formUrl:
+          type: string
+          format: uri
+        fields:
+          type: array
+          items:
+            $ref: "#/components/schemas/FormField"
+        captchaRequired:
+          type: boolean
+          default: false
+    FieldAnswer:
+      type: object
+      required: [fieldName, value]
+      properties:
+        fieldName:
+          type: string
+        value:
+          type: string
+        aiGenerated:
+          type: boolean
+          default: false
+    SubmissionError:
+      type: object
+      required: [code, message]
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        fieldName:
+          type: string
+    SubmissionResult:
+      type: object
+      properties:
+        confirmationId:
+          type: string
+        confirmationUrl:
+          type: string
+          format: uri
+        errors:
+          type: array
+          items:
+            $ref: "#/components/schemas/SubmissionError"
+    ApplicationSubmission:
+      x-entity: true
+      type: object
+      required: [id, applicationId, jobPostingId, status]
+      properties:
+        id:
+          type: string
+        applicationId:
+          type: string
+        jobPostingId:
+          type: string
+        status:
+          $ref: "#/components/schemas/SubmissionStatus"
+        formUrl:
+          type: string
+          format: uri
+        form:
+          $ref: "#/components/schemas/ApplicationForm"
+        fieldAnswers:
+          type: array
+          items:
+            $ref: "#/components/schemas/FieldAnswer"
+        result:
+          $ref: "#/components/schemas/SubmissionResult"
+        createdAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+    ApplicationSubmissionListResponse:
+      type: object
+      properties:
+        submissions:
+          type: array
+          items:
+            $ref: "#/components/schemas/ApplicationSubmission"
+    SubmitApplicationRequest:
+      type: object
+      required: [applicationId]
+      properties:
+        applicationId:
+          type: string
+        formUrl:
+          type: string
+          format: uri
+        fieldAnswers:
+          type: array
+          items:
+            $ref: "#/components/schemas/FieldAnswer"
+        resumeId:
+          type: string

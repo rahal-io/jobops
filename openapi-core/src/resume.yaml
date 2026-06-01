@@ -49,7 +49,63 @@ paths:
           content:
             application/json:
               schema:
+                $ref: "#/components/schemas/GeneratedResume"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /resumes/{resumeId}:
+    patch:
+      operationId: UpdateResume
+      summary: Update base resume content
+      tags: [Resume]
+      parameters:
+        - $ref: "#/components/parameters/ResumeId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateResumeRequest"
+      responses:
+        "200":
+          description: Updated resume
+          content:
+            application/json:
+              schema:
                 $ref: "#/components/schemas/Resume"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /resumes/{resumeId}/optimize:
+    post:
+      operationId: OptimizeResumeForJob
+      summary: Optimize resume keywords for a target job
+      tags: [Resume]
+      parameters:
+        - $ref: "#/components/parameters/ResumeId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OptimizeResumeForJobRequest"
+      responses:
+        "200":
+          description: Optimized resume variant
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GeneratedResume"
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
@@ -85,10 +141,16 @@ components:
   schemas:
     Resume:
       $ref: "resume.schemas.yaml#/components/schemas/Resume"
+    GeneratedResume:
+      $ref: "resume.schemas.yaml#/components/schemas/GeneratedResume"
     ResumeListResponse:
       $ref: "resume.schemas.yaml#/components/schemas/ResumeListResponse"
     GenerateResumeRequest:
       $ref: "resume.schemas.yaml#/components/schemas/GenerateResumeRequest"
+    UpdateResumeRequest:
+      $ref: "resume.schemas.yaml#/components/schemas/UpdateResumeRequest"
+    OptimizeResumeForJobRequest:
+      $ref: "resume.schemas.yaml#/components/schemas/OptimizeResumeForJobRequest"
   parameters:
     ResumeId:
       $ref: "common/parameters.yaml#/components/parameters/ResumeId"

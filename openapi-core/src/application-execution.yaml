@@ -1,10 +1,12 @@
 openapi: 3.1.0
 info:
-  title: jobops - Job Evaluation
+  title: jobops - Application Execution
   version: 1.0.0
-  x-domain: eval
-  x-cli-modes: [oferta, ofertas, batch]
-  description: Score and rank job listings against the user profile (10D / A–F fit model).
+  x-domain: aex
+  x-cli-modes: [apply]
+  description: |
+    Auto-fill and submit job application forms; tracks submission attempts
+    and links back to pipeline applications by id.
   license:
     name: MIT
     identifier: MIT
@@ -13,33 +15,25 @@ servers:
 security:
   - bearerAuth: []
 paths:
-  /evaluation/jobs:
+  /execution/submissions:
     get:
-      operationId: ListJobEvaluations
-      summary: List evaluations with optional filters
-      tags: [Evaluation]
+      operationId: ListApplicationSubmissions
+      summary: List submissions, optionally filtered by application
+      tags: [Execution]
       parameters:
-        - name: jobId
+        - name: applicationId
           in: query
           schema:
             type: string
-        - name: minGrade
-          in: query
-          schema:
-            type: string
-        - name: filteredOut
-          in: query
-          schema:
-            type: boolean
         - $ref: "#/components/parameters/Cursor"
         - $ref: "#/components/parameters/Limit"
       responses:
         "200":
-          description: Evaluations
+          description: Submissions
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/JobEvaluationListResponse"
+                $ref: "#/components/schemas/ApplicationSubmissionListResponse"
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
@@ -48,20 +42,23 @@ paths:
           $ref: "#/components/responses/Forbidden"
         "404":
           $ref: "#/components/responses/NotFound"
-  /evaluation/jobs/{jobId}:
     post:
-      operationId: CreateEvaluationForJob
-      summary: Evaluate job fit for a listing
-      tags: [Evaluation]
-      parameters:
-        - $ref: "#/components/parameters/JobId"
+      operationId: SubmitApplication
+      summary: Auto-fill and submit an application form
+      tags: [Execution]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubmitApplicationRequest"
       responses:
-        "200":
-          description: Evaluation result
+        "202":
+          description: Submission accepted (async)
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/JobEvaluation"
+                $ref: "#/components/schemas/ApplicationSubmission"
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
@@ -70,42 +67,42 @@ paths:
           $ref: "#/components/responses/Forbidden"
         "404":
           $ref: "#/components/responses/NotFound"
-  /evaluation/jobs/{jobId}/reevaluate:
-    post:
-      operationId: ReevaluateJob
-      summary: Re-run evaluation after profile or goals change
-      tags: [Evaluation]
-      parameters:
-        - $ref: "#/components/parameters/JobId"
-      responses:
-        "200":
-          description: Updated evaluation
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/JobEvaluation"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
-        "404":
-          $ref: "#/components/responses/NotFound"
-  /evaluation/{evaluationId}:
+  /execution/submissions/{submissionId}:
     get:
-      operationId: GetJobEvaluation
-      summary: Get a persisted evaluation by id
-      tags: [Evaluation]
+      operationId: GetApplicationSubmission
+      summary: Get submission status and result
+      tags: [Execution]
       parameters:
-        - $ref: "#/components/parameters/EvaluationId"
+        - $ref: "#/components/parameters/SubmissionId"
       responses:
         "200":
-          description: Evaluation
+          description: Submission
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/JobEvaluation"
+                $ref: "#/components/schemas/ApplicationSubmission"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /execution/submissions/{submissionId}/retry:
+    post:
+      operationId: RetryApplicationSubmission
+      summary: Retry a failed submission
+      tags: [Execution]
+      parameters:
+        - $ref: "#/components/parameters/SubmissionId"
+      responses:
+        "202":
+          description: Retry accepted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApplicationSubmission"
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
@@ -116,15 +113,15 @@ paths:
           $ref: "#/components/responses/NotFound"
 components:
   schemas:
-    JobEvaluation:
-      $ref: "evaluation.schemas.yaml#/components/schemas/JobEvaluation"
-    JobEvaluationListResponse:
-      $ref: "evaluation.schemas.yaml#/components/schemas/JobEvaluationListResponse"
+    ApplicationSubmission:
+      $ref: "application-execution.schemas.yaml#/components/schemas/ApplicationSubmission"
+    ApplicationSubmissionListResponse:
+      $ref: "application-execution.schemas.yaml#/components/schemas/ApplicationSubmissionListResponse"
+    SubmitApplicationRequest:
+      $ref: "application-execution.schemas.yaml#/components/schemas/SubmitApplicationRequest"
   parameters:
-    JobId:
-      $ref: "common/parameters.yaml#/components/parameters/JobId"
-    EvaluationId:
-      $ref: "common/parameters.yaml#/components/parameters/EvaluationId"
+    SubmissionId:
+      $ref: "common/parameters.yaml#/components/parameters/SubmissionId"
     Cursor:
       $ref: "common/parameters.yaml#/components/parameters/Cursor"
     Limit:

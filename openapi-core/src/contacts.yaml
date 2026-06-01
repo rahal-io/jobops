@@ -58,6 +58,80 @@ paths:
           $ref: "#/components/responses/Forbidden"
         "404":
           $ref: "#/components/responses/NotFound"
+  /contacts/templates:
+    get:
+      operationId: ListMessageTemplates
+      summary: List outreach message templates
+      tags: [Contacts]
+      responses:
+        "200":
+          description: Templates
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageTemplateListResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    post:
+      operationId: CreateMessageTemplate
+      summary: Create a message template
+      tags: [Contacts]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateMessageTemplateRequest"
+      responses:
+        "201":
+          description: Template created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageTemplate"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /contacts/outreach-logs:
+    get:
+      operationId: ListOutreachLogs
+      summary: List outreach message history
+      tags: [Contacts]
+      parameters:
+        - name: contactId
+          in: query
+          schema:
+            type: string
+        - name: applicationId
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Outreach logs
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OutreachLogListResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
   /contacts/messages/send:
     post:
       operationId: SendOutreachMessage
@@ -72,6 +146,10 @@ paths:
       responses:
         "202":
           description: Message queued
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OutreachLog"
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
@@ -88,8 +166,18 @@ components:
       $ref: "contacts.schemas.yaml#/components/schemas/ContactListResponse"
     CreateContactRequest:
       $ref: "contacts.schemas.yaml#/components/schemas/CreateContactRequest"
+    MessageTemplate:
+      $ref: "contacts.schemas.yaml#/components/schemas/MessageTemplate"
+    MessageTemplateListResponse:
+      $ref: "contacts.schemas.yaml#/components/schemas/MessageTemplateListResponse"
+    CreateMessageTemplateRequest:
+      $ref: "contacts.schemas.yaml#/components/schemas/CreateMessageTemplateRequest"
     OutreachMessage:
       $ref: "contacts.schemas.yaml#/components/schemas/OutreachMessage"
+    OutreachLog:
+      $ref: "contacts.schemas.yaml#/components/schemas/OutreachLog"
+    OutreachLogListResponse:
+      $ref: "contacts.schemas.yaml#/components/schemas/OutreachLogListResponse"
   securitySchemes:
     bearerAuth:
       $ref: "common/security.yaml#/components/securitySchemes/bearerAuth"

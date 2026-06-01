@@ -1,0 +1,359 @@
+openapi: 3.1.0
+info:
+  title: jobops - AI Schemas
+  version: 1.0.0
+  x-domain: aia
+  description: Models, prompts, inference, and agent runs for job-search workflows.
+  license:
+    name: MIT
+    identifier: MIT
+paths: {}
+servers:
+  - url: https://api.jobops.dev
+components:
+  schemas:
+    InferenceMode:
+      type: string
+      enum: [chat, completion, embedding]
+    JobSearchWorkflow:
+      type: string
+      description: Bounded-context-aligned agent workflow
+      enum:
+        - evaluate_job
+        - tailor_resume
+        - apply_form
+        - outreach_message
+        - interview_prep
+        - company_research
+        - batch_evaluate
+    AgentRunStatus:
+      type: string
+      enum: [pending, running, completed, failed, cancelled]
+    AiModel:
+      x-entity: true
+      type: object
+      required: [id, provider, name, enabled]
+      properties:
+        id:
+          type: string
+        provider:
+          type: string
+          description: openai, anthropic, google, etc.
+        name:
+          type: string
+          description: Provider model id (e.g. gpt-4o-mini)
+        displayName:
+          type: string
+        maxTokens:
+          type: integer
+        enabled:
+          type: boolean
+        isDefault:
+          type: boolean
+    ModelListResponse:
+      type: object
+      properties:
+        models:
+          type: array
+          items:
+            $ref: "#/components/schemas/AiModel"
+    UpdateDefaultModelRequest:
+      type: object
+      required: [modelId]
+      properties:
+        modelId:
+          type: string
+    PromptTemplate:
+      x-entity: true
+      type: object
+      required: [id, name, workflow, body]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        workflow:
+          $ref: "#/components/schemas/JobSearchWorkflow"
+        description:
+          type: string
+        body:
+          type: string
+          description: Template with {{variable}} placeholders
+        variables:
+          type: array
+          items:
+            type: string
+        version:
+          type: string
+    PromptListResponse:
+      type: object
+      properties:
+        prompts:
+          type: array
+          items:
+            $ref: "#/components/schemas/PromptTemplate"
+    CreatePromptRequest:
+      type: object
+      required: [name, workflow, body]
+      properties:
+        name:
+          type: string
+        workflow:
+          $ref: "#/components/schemas/JobSearchWorkflow"
+        description:
+          type: string
+        body:
+          type: string
+    UpdatePromptRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        body:
+          type: string
+    ChatMessage:
+      type: object
+      required: [role, content]
+      properties:
+        role:
+          type: string
+          enum: [system, user, assistant]
+        content:
+          type: string
+    InferenceRequest:
+      type: object
+      required: [modelId, mode, input]
+      properties:
+        modelId:
+          type: string
+        mode:
+          $ref: "#/components/schemas/InferenceMode"
+        promptTemplateId:
+          type: string
+          description: Optional jobops prompt template
+        input:
+          type: object
+          description: Mode-specific payload (messages, prompt text, or texts to embed)
+          properties:
+            messages:
+              type: array
+              items:
+                $ref: "#/components/schemas/ChatMessage"
+            prompt:
+              type: string
+            variables:
+              type: object
+              additionalProperties:
+                type: string
+            texts:
+              type: array
+              items:
+                type: string
+    JobEvaluationWorkflowResult:
+      type: object
+      properties:
+        jobId:
+          type: string
+        overallGrade:
+          type: string
+        dimensions:
+          type: array
+          items:
+            type: object
+            properties:
+              dimension:
+                type: string
+              grade:
+                type: string
+    ResumeDraftWorkflowResult:
+      type: object
+      properties:
+        resumeId:
+          type: string
+        jobId:
+          type: string
+        draftText:
+          type: string
+        keywords:
+          type: array
+          items:
+            type: string
+    FormFillWorkflowResult:
+      type: object
+      properties:
+        applicationId:
+          type: string
+        fieldAnswers:
+          type: array
+          items:
+            type: object
+            properties:
+              fieldName:
+                type: string
+              value:
+                type: string
+    OutreachDraftWorkflowResult:
+      type: object
+      properties:
+        contactId:
+          type: string
+        message:
+          type: string
+    InterviewPrepWorkflowResult:
+      type: object
+      properties:
+        questions:
+          type: array
+          items:
+            type: string
+        tips:
+          type: array
+          items:
+            type: string
+    CompanyResearchWorkflowResult:
+      type: object
+      properties:
+        companyId:
+          type: string
+        summary:
+          type: string
+        themes:
+          type: array
+          items:
+            type: string
+    BatchEvaluateWorkflowResult:
+      type: object
+      properties:
+        evaluationIds:
+          type: array
+          items:
+            type: string
+        filteredCount:
+          type: integer
+    AgentWorkflowResult:
+      oneOf:
+        - $ref: "#/components/schemas/JobEvaluationWorkflowResult"
+        - $ref: "#/components/schemas/ResumeDraftWorkflowResult"
+        - $ref: "#/components/schemas/FormFillWorkflowResult"
+        - $ref: "#/components/schemas/OutreachDraftWorkflowResult"
+        - $ref: "#/components/schemas/InterviewPrepWorkflowResult"
+        - $ref: "#/components/schemas/CompanyResearchWorkflowResult"
+        - $ref: "#/components/schemas/BatchEvaluateWorkflowResult"
+    InferenceResult:
+      type: object
+      properties:
+        output:
+          $ref: "#/components/schemas/AgentWorkflowResult"
+        tokensUsed:
+          type: integer
+        modelId:
+          type: string
+    ProfileSnapshot:
+      type: object
+      properties:
+        userId:
+          type: string
+        displayName:
+          type: string
+        headline:
+          type: string
+        industries:
+          type: array
+          items:
+            type: string
+        skills:
+          type: array
+          items:
+            type: string
+    WorkflowContext:
+      type: object
+      description: References passed into an agent run (other bounded contexts)
+      properties:
+        jobId:
+          type: string
+        applicationId:
+          type: string
+        resumeId:
+          type: string
+        companyId:
+          type: string
+        contactId:
+          type: string
+        profileSnapshot:
+          $ref: "#/components/schemas/ProfileSnapshot"
+        extra:
+          type: object
+          additionalProperties:
+            type: string
+    CreateAgentRunRequest:
+      type: object
+      required: [workflow]
+      properties:
+        workflow:
+          $ref: "#/components/schemas/JobSearchWorkflow"
+        modelId:
+          type: string
+        promptTemplateId:
+          type: string
+        context:
+          $ref: "#/components/schemas/WorkflowContext"
+        variables:
+          type: object
+          additionalProperties:
+            type: string
+    AgentRun:
+      x-entity: true
+      type: object
+      required: [id, workflow, status]
+      properties:
+        id:
+          type: string
+        workflow:
+          $ref: "#/components/schemas/JobSearchWorkflow"
+        status:
+          $ref: "#/components/schemas/AgentRunStatus"
+        modelId:
+          type: string
+        promptTemplateId:
+          type: string
+        context:
+          $ref: "#/components/schemas/WorkflowContext"
+        result:
+          $ref: "#/components/schemas/AgentWorkflowResult"
+        error:
+          type: string
+        tokensUsed:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+    AgentRunListResponse:
+      type: object
+      properties:
+        runs:
+          type: array
+          items:
+            $ref: "#/components/schemas/AgentRun"
+    UsageSummary:
+      type: object
+      properties:
+        totalTokens:
+          type: integer
+        totalRuns:
+          type: integer
+        byWorkflow:
+          type: array
+          items:
+            type: object
+            properties:
+              workflow:
+                $ref: "#/components/schemas/JobSearchWorkflow"
+              tokens:
+                type: integer
+              runs:
+                type: integer

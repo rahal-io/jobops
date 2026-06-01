@@ -3,6 +3,7 @@ info:
   title: jobops - Company Schemas
   version: 1.0.0
   x-domain: co
+  description: Company profiles, reviews, ratings, news, and sentiment.
   license:
     name: MIT
     identifier: MIT
@@ -11,7 +12,54 @@ servers:
   - url: https://api.jobops.dev
 components:
   schemas:
+    GlassdoorRating:
+      type: object
+      properties:
+        overall:
+          type: number
+        culture:
+          type: number
+        compensation:
+          type: number
+        workLifeBalance:
+          type: number
+        reviewCount:
+          type: integer
+    EmployerReview:
+      type: object
+      required: [id, rating, summary]
+      properties:
+        id:
+          type: string
+        rating:
+          type: number
+        summary:
+          type: string
+        role:
+          type: string
+        pros:
+          type: string
+        cons:
+          type: string
+        publishedAt:
+          type: string
+          format: date
+    CompanySentiment:
+      type: object
+      properties:
+        score:
+          type: number
+          format: float
+          description: -1 to 1 sentiment score
+        label:
+          type: string
+          enum: [negative, neutral, positive]
+        themes:
+          type: array
+          items:
+            type: string
     CompanyProfile:
+      x-entity: true
       type: object
       required: [id, name]
       properties:
@@ -23,11 +71,27 @@ components:
           type: string
         rating:
           type: number
+        glassdoor:
+          $ref: "#/components/schemas/GlassdoorRating"
+        reviews:
+          type: array
+          items:
+            $ref: "#/components/schemas/EmployerReview"
         industry:
           type: string
         website:
           type: string
           format: uri
+        techStack:
+          type: array
+          items:
+            type: string
+        cultureTags:
+          type: array
+          items:
+            type: string
+        sentiment:
+          $ref: "#/components/schemas/CompanySentiment"
     NewsArticle:
       type: object
       required: [title, url]
@@ -49,3 +113,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/NewsArticle"
+    CompanySentimentResponse:
+      type: object
+      properties:
+        companyId:
+          type: string
+        sentiment:
+          $ref: "#/components/schemas/CompanySentiment"

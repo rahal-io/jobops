@@ -4,7 +4,7 @@ info:
   version: 1.0.0
   x-domain: trn
   x-cli-modes: [training, project]
-  description: Courses, portfolio projects, and skill-gap recommendations.
+  description: Courses, portfolio projects, certifications, and skill-gap recommendations.
   license:
     name: MIT
     identifier: MIT
@@ -13,6 +13,26 @@ servers:
 security:
   - bearerAuth: []
 paths:
+  /training/portfolio:
+    get:
+      operationId: GetTrainingPortfolio
+      summary: Get full learning portfolio aggregate
+      tags: [Training]
+      responses:
+        "200":
+          description: Portfolio
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Portfolio"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
   /training/courses:
     get:
       operationId: ListTrainingCourses
@@ -33,6 +53,89 @@ paths:
           $ref: "#/components/responses/Forbidden"
         "404":
           $ref: "#/components/responses/NotFound"
+    post:
+      operationId: CreateTrainingCourse
+      summary: Add a course to the portfolio
+      tags: [Training]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCourseRequest"
+      responses:
+        "201":
+          description: Course created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Course"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /training/courses/{courseId}:
+    patch:
+      operationId: UpdateTrainingCourse
+      summary: Update course progress or status
+      tags: [Training]
+      parameters:
+        - name: courseId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateCourseRequest"
+      responses:
+        "200":
+          description: Updated course
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Course"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /training/courses/{courseId}/complete:
+    post:
+      operationId: CompleteTrainingCourse
+      summary: Mark a course as completed
+      tags: [Training]
+      parameters:
+        - name: courseId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Completed course
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Course"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
   /training/projects:
     get:
       operationId: ListTrainingProjects
@@ -45,6 +148,51 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProjectListResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    post:
+      operationId: CreateTrainingProject
+      summary: Add a portfolio project
+      tags: [Training]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateProjectRequest"
+      responses:
+        "201":
+          description: Project created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Project"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /training/certifications:
+    get:
+      operationId: ListTrainingCertifications
+      summary: List certifications
+      tags: [Training]
+      responses:
+        "200":
+          description: Certifications
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CertificationListResponse"
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
@@ -75,10 +223,24 @@ paths:
           $ref: "#/components/responses/NotFound"
 components:
   schemas:
+    Portfolio:
+      $ref: "training.schemas.yaml#/components/schemas/Portfolio"
+    Course:
+      $ref: "training.schemas.yaml#/components/schemas/Course"
     CourseListResponse:
       $ref: "training.schemas.yaml#/components/schemas/CourseListResponse"
+    CreateCourseRequest:
+      $ref: "training.schemas.yaml#/components/schemas/CreateCourseRequest"
+    UpdateCourseRequest:
+      $ref: "training.schemas.yaml#/components/schemas/UpdateCourseRequest"
+    Project:
+      $ref: "training.schemas.yaml#/components/schemas/Project"
     ProjectListResponse:
       $ref: "training.schemas.yaml#/components/schemas/ProjectListResponse"
+    CreateProjectRequest:
+      $ref: "training.schemas.yaml#/components/schemas/CreateProjectRequest"
+    CertificationListResponse:
+      $ref: "training.schemas.yaml#/components/schemas/CertificationListResponse"
     RecommendationListResponse:
       $ref: "training.schemas.yaml#/components/schemas/RecommendationListResponse"
   securitySchemes:

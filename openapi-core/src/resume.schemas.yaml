@@ -3,6 +3,7 @@ info:
   title: jobops - Resume Schemas
   version: 1.0.0
   x-domain: res
+  description: Resumes, templates, ATS keywords, and generated CV variants.
   license:
     name: MIT
     identifier: MIT
@@ -11,6 +12,28 @@ servers:
   - url: https://api.jobops.dev
 components:
   schemas:
+    ResumeSection:
+      type: string
+      enum: [summary, experience, education, skills, certifications, projects]
+    Skill:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+        level:
+          type: string
+          enum: [beginner, intermediate, advanced, expert]
+    Certification:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+        issuer:
+          type: string
+        year:
+          type: integer
     Experience:
       type: object
       required: [company, title, startDate]
@@ -25,6 +48,10 @@ components:
         endDate:
           type: string
           format: date
+        highlights:
+          type: array
+          items:
+            type: string
     Education:
       type: object
       required: [institution, degree]
@@ -35,7 +62,34 @@ components:
           type: string
         year:
           type: integer
+    CvTemplate:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        region:
+          type: string
+          enum: [US, EU, UK]
+        paperSize:
+          type: string
+          enum: [letter, A4]
+    AtsKeywordSet:
+      type: object
+      properties:
+        keywords:
+          type: array
+          items:
+            type: string
+        jobId:
+          type: string
+        matchScore:
+          type: number
+          format: float
     Resume:
+      x-entity: true
       type: object
       required: [id, userId, name]
       properties:
@@ -44,6 +98,8 @@ components:
         userId:
           type: string
         name:
+          type: string
+        templateId:
           type: string
         experiences:
           type: array
@@ -56,10 +112,33 @@ components:
         skills:
           type: array
           items:
-            type: string
+            $ref: "#/components/schemas/Skill"
+        certifications:
+          type: array
+          items:
+            $ref: "#/components/schemas/Certification"
         pdfUrl:
           type: string
           format: uri
+    GeneratedResume:
+      x-entity: true
+      type: object
+      required: [id, resumeId, jobId]
+      properties:
+        id:
+          type: string
+        resumeId:
+          type: string
+        jobId:
+          type: string
+        pdfUrl:
+          type: string
+          format: uri
+        keywordSet:
+          $ref: "#/components/schemas/AtsKeywordSet"
+        generatedAt:
+          type: string
+          format: date-time
     ResumeListResponse:
       type: object
       properties:
@@ -74,4 +153,35 @@ components:
         templateId:
           type: string
         targetJobId:
+          type: string
+    UpdateResumeRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        templateId:
+          type: string
+        experiences:
+          type: array
+          items:
+            $ref: "#/components/schemas/Experience"
+        education:
+          type: array
+          items:
+            $ref: "#/components/schemas/Education"
+        skills:
+          type: array
+          items:
+            $ref: "#/components/schemas/Skill"
+        certifications:
+          type: array
+          items:
+            $ref: "#/components/schemas/Certification"
+    OptimizeResumeForJobRequest:
+      type: object
+      required: [jobId]
+      properties:
+        jobId:
+          type: string
+        resumeId:
           type: string

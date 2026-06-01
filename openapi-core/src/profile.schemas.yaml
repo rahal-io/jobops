@@ -3,6 +3,7 @@ info:
   title: jobops - Profile Schemas
   version: 1.0.0
   x-domain: prf
+  description: User profile, contact info, credentials, and preferences.
   license:
     name: MIT
     identifier: MIT
@@ -11,7 +12,40 @@ servers:
   - url: https://api.jobops.dev
 components:
   schemas:
+    ContactInfo:
+      type: object
+      properties:
+        phone:
+          type: string
+        linkedInUrl:
+          type: string
+          format: uri
+        website:
+          type: string
+          format: uri
+        location:
+          type: string
+    SkillSummary:
+      type: object
+      properties:
+        name:
+          type: string
+        years:
+          type: number
+    Credential:
+      type: object
+      required: [id, provider]
+      properties:
+        id:
+          type: string
+        provider:
+          type: string
+          enum: [google, linkedin, github, email]
+        externalId:
+          type: string
+          description: Opaque provider subject id; never store secrets here
     UserProfile:
+      x-entity: true
       type: object
       required: [id, email]
       properties:
@@ -24,6 +58,16 @@ components:
           type: string
         headline:
           type: string
+        contactInfo:
+          $ref: "#/components/schemas/ContactInfo"
+        credentials:
+          type: array
+          items:
+            $ref: "#/components/schemas/Credential"
+        skillSummary:
+          type: array
+          items:
+            $ref: "#/components/schemas/SkillSummary"
     UserPreferences:
       type: object
       properties:
@@ -48,5 +92,11 @@ components:
           type: string
         headline:
           type: string
+        contactInfo:
+          $ref: "#/components/schemas/ContactInfo"
+        skillSummary:
+          type: array
+          items:
+            $ref: "#/components/schemas/SkillSummary"
     UpdatePreferencesRequest:
       $ref: "#/components/schemas/UserPreferences"

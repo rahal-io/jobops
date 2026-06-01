@@ -3,6 +3,7 @@ info:
   title: jobops - Strategy Schemas
   version: 1.0.0
   x-domain: str
+  description: North Star archetype, career goals, and goal metrics.
   license:
     name: MIT
     identifier: MIT
@@ -11,17 +12,36 @@ servers:
   - url: https://api.jobops.dev
 components:
   schemas:
+    CareerArchetype:
+      type: string
+      enum:
+        - AgenticWorkflows
+        - PlatformEngineering
+        - DataScience
+        - ProductLeadership
+        - StaffEngineering
+        - Other
+    GoalMetric:
+      type: object
+      properties:
+        name:
+          type: string
+        targetValue:
+          type: number
+        currentValue:
+          type: number
+        unit:
+          type: string
     NorthStar:
       type: object
       required: [archetype]
       properties:
         archetype:
-          type: string
-          description: Career archetype that guides scoring and CV narrative
-          example: Agentic Workflows
+          $ref: "#/components/schemas/CareerArchetype"
         summary:
           type: string
     CareerGoal:
+      x-entity: true
       type: object
       required: [id, title]
       properties:
@@ -35,6 +55,13 @@ components:
         status:
           type: string
           enum: [Active, Achieved, Paused]
+        metrics:
+          type: array
+          items:
+            $ref: "#/components/schemas/GoalMetric"
+        analyticsGoalId:
+          type: string
+          description: Optional link to analytics AnalyticsGoal id for progress tracking
     CareerStrategy:
       type: object
       properties:
@@ -49,7 +76,7 @@ components:
       required: [archetype]
       properties:
         archetype:
-          type: string
+          $ref: "#/components/schemas/CareerArchetype"
         summary:
           type: string
     CreateCareerGoalRequest:
@@ -61,3 +88,7 @@ components:
         targetDate:
           type: string
           format: date
+        metrics:
+          type: array
+          items:
+            $ref: "#/components/schemas/GoalMetric"

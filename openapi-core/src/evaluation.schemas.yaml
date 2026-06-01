@@ -12,13 +12,25 @@ servers:
   - url: https://api.jobops.dev
 components:
   schemas:
+    FitDimension:
+      type: string
+      enum:
+        - RoleMatch
+        - SkillsAlignment
+        - Seniority
+        - Compensation
+        - Geographic
+        - Growth
+        - Culture
+        - WorkLife
+        - Industry
+        - Network
     DimensionScore:
       type: object
       required: [dimension, grade]
       properties:
         dimension:
-          type: string
-          example: RoleMatch
+          $ref: "#/components/schemas/FitDimension"
         grade:
           type: string
           description: Letter grade for this dimension
@@ -27,9 +39,12 @@ components:
           type: number
           format: float
     JobEvaluation:
+      x-entity: true
       type: object
-      required: [jobId, overallGrade]
+      required: [id, jobId, overallGrade, evaluatedAt]
       properties:
+        id:
+          type: string
         jobId:
           type: string
         overallGrade:
@@ -42,3 +57,15 @@ components:
         filteredOut:
           type: boolean
           description: True when score is below user threshold
+        evaluatedAt:
+          type: string
+          format: date-time
+    JobEvaluationListResponse:
+      type: object
+      properties:
+        evaluations:
+          type: array
+          items:
+            $ref: "#/components/schemas/JobEvaluation"
+        nextCursor:
+          type: string

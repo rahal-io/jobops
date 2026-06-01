@@ -26,16 +26,17 @@ Each context owns its models and terms. Cross-context integration uses domain ev
 | **Opportunity Discovery** | Crawl and aggregate job postings from portals and boards |
 | **Job Evaluation** | Score and rank jobs (e.g. multi-dimensional / A–F fit model) |
 | **Resume / CV Generation** | Tailor ATS-optimized resumes and PDFs per role |
-| **Application Execution** | Auto-fill and submit application forms |
-| **Pipeline & Tracking** | Source of truth for applications, statuses, follow-ups, deduplication |
+| **Application Execution** | Auto-fill and submit application forms (`application-execution` OpenAPI spec) |
+| **Pipeline & Tracking** | Source of truth for applications, statuses, follow-ups, deduplication (`pipeline` OpenAPI spec) |
 | **Company Research** | Company profiles, culture, news for fit and interviews |
 | **Contact / Outreach** | Contacts, templates, LinkedIn/email outreach |
 | **Interview Preparation** | Story bank (STAR), questions, negotiation scripts |
 | **Training & Projects** | Courses, certifications, portfolio projects vs skill gaps |
 | **Career Strategy (North Star)** | Goals, archetype, preferences that personalize scoring and CVs |
 | **Analytics & Patterns** | Rejection patterns, pipeline metrics, insights back to strategy |
+| **AI** | Models, workflow prompts, inference, and agent runs for evaluate / apply / resume / outreach / interview |
 
-[`domain-models.md`](.design/domain-models.md) also describes a consolidated **Application Management** view (apply + pipeline + follow-up), **Offer Evaluation** (compensation-focused scoring for received offers), and **User/Profile** (auth, preferences, shared profile data).
+[`domain-models.md`](.design/domain-models.md) documents **Pipeline & Tracking** and **Application Execution** as separate OpenAPI specs (`pipeline`, `application-execution`), plus **Offer Evaluation**, and **User/Profile**.
 
 ### Typical flow
 
@@ -58,7 +59,7 @@ Command modes map to bounded contexts (see [context-map §4](.design/context-map
 | `ofertas` | Opportunity Discovery / Job Evaluation (filter & score listings) |
 | `oferta` | Job Evaluation (listing fit) or Offer Evaluation (compensation package) |
 | `pdf` | Resume / CV Generation |
-| `apply` | Application Execution (or Application Management) |
+| `apply` | Application Execution |
 | `pipeline`, `tracker`, `followup` | Pipeline & Tracking |
 | `deep` | Company Research |
 | `contacto` | Contact / Outreach |
@@ -82,6 +83,7 @@ Example invocations (from design): `/jobops scan`, `/jobops apply`, `/jobops int
 |------|---------|
 | [`.design/`](.design/) | DDD context map, domain models, CLI mode mapping |
 | [`openapi-core/`](openapi-core/) | OpenAPI 3.1 specs per bounded context (see [`openapi-core/README.md`](openapi-core/README.md)) |
+| [`.codegen-jobops/`](.codegen-jobops/) | OpenAPI → TypeScript codegen (`@jobops/*` packages) |
 | [`EXAMPLE_openapi-core/`](EXAMPLE_openapi-core/) | Reference layout for spec authoring (upstream template) |
 
 ## Status

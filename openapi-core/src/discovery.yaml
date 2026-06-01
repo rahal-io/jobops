@@ -15,6 +15,26 @@ servers:
 security:
   - bearerAuth: []
 paths:
+  /discovery/boards:
+    get:
+      operationId: ListDiscoveryJobBoards
+      summary: List configured job boards and portals
+      tags: [Discovery]
+      responses:
+        "200":
+          description: Job boards
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobBoardListResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
   /discovery/jobs/search:
     post:
       operationId: CreateDiscoveryJobSearch
@@ -33,6 +53,32 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/JobListResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /discovery/jobs/search/batch:
+    post:
+      operationId: CreateDiscoveryBatchJobSearch
+      summary: Start async batch search across filters and boards
+      tags: [Discovery]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BatchSearchRequest"
+      responses:
+        "202":
+          description: Batch search accepted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobSearch"
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
@@ -85,16 +131,71 @@ paths:
           $ref: "#/components/responses/Forbidden"
         "404":
           $ref: "#/components/responses/NotFound"
+  /discovery/saved-jobs:
+    get:
+      operationId: ListDiscoverySavedJobs
+      summary: List jobs saved to pipeline consideration
+      tags: [Discovery]
+      responses:
+        "200":
+          description: Saved jobs
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SavedJobListResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    post:
+      operationId: SaveDiscoveryJob
+      summary: Save a job posting for later pipeline action
+      tags: [Discovery]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SaveJobRequest"
+      responses:
+        "201":
+          description: Job saved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SavedJob"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
 components:
   schemas:
     SearchRequest:
       $ref: "discovery.schemas.yaml#/components/schemas/SearchRequest"
+    BatchSearchRequest:
+      $ref: "discovery.schemas.yaml#/components/schemas/BatchSearchRequest"
     JobPosting:
       $ref: "discovery.schemas.yaml#/components/schemas/JobPosting"
     JobListResponse:
       $ref: "discovery.schemas.yaml#/components/schemas/JobListResponse"
     JobSearch:
       $ref: "discovery.schemas.yaml#/components/schemas/JobSearch"
+    JobBoardListResponse:
+      $ref: "discovery.schemas.yaml#/components/schemas/JobBoardListResponse"
+    SaveJobRequest:
+      $ref: "discovery.schemas.yaml#/components/schemas/SaveJobRequest"
+    SavedJob:
+      $ref: "discovery.schemas.yaml#/components/schemas/SavedJob"
+    SavedJobListResponse:
+      $ref: "discovery.schemas.yaml#/components/schemas/SavedJobListResponse"
   parameters:
     JobId:
       $ref: "common/parameters.yaml#/components/parameters/JobId"

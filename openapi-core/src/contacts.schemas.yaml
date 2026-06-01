@@ -3,6 +3,7 @@ info:
   title: jobops - Contacts Schemas
   version: 1.0.0
   x-domain: con
+  description: Contacts, message templates, and outreach logs.
   license:
     name: MIT
     identifier: MIT
@@ -14,7 +15,11 @@ components:
     ContactChannel:
       type: string
       enum: [LinkedIn, Email, Phone]
+    ResponseStatus:
+      type: string
+      enum: [pending, sent, delivered, read, replied, bounced, failed]
     Contact:
+      x-entity: true
       type: object
       required: [id, name, channel]
       properties:
@@ -26,8 +31,13 @@ components:
           type: string
         company:
           type: string
+        companyId:
+          type: string
         channel:
           $ref: "#/components/schemas/ContactChannel"
+        isRecruiter:
+          type: boolean
+          default: false
     ContactListResponse:
       type: object
       properties:
@@ -45,8 +55,51 @@ components:
           type: string
         company:
           type: string
+        companyId:
+          type: string
         channel:
           $ref: "#/components/schemas/ContactChannel"
+        isRecruiter:
+          type: boolean
+    MessageTemplate:
+      x-entity: true
+      type: object
+      required: [id, name, channel, body]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        channel:
+          $ref: "#/components/schemas/ContactChannel"
+        body:
+          type: string
+          description: Template with {{variable}} placeholders
+        variables:
+          type: array
+          items:
+            type: string
+    CreateMessageTemplateRequest:
+      type: object
+      required: [name, channel, body]
+      properties:
+        name:
+          type: string
+        channel:
+          $ref: "#/components/schemas/ContactChannel"
+        body:
+          type: string
+        variables:
+          type: array
+          items:
+            type: string
+    MessageTemplateListResponse:
+      type: object
+      properties:
+        templates:
+          type: array
+          items:
+            $ref: "#/components/schemas/MessageTemplate"
     OutreachMessage:
       type: object
       required: [contactId, content]
@@ -55,3 +108,36 @@ components:
           type: string
         content:
           type: string
+        templateId:
+          type: string
+        applicationId:
+          type: string
+    OutreachLog:
+      x-entity: true
+      type: object
+      required: [id, contactId, channel, status, sentAt]
+      properties:
+        id:
+          type: string
+        contactId:
+          type: string
+        channel:
+          $ref: "#/components/schemas/ContactChannel"
+        status:
+          $ref: "#/components/schemas/ResponseStatus"
+        content:
+          type: string
+        sentAt:
+          type: string
+          format: date-time
+        responseStatus:
+          $ref: "#/components/schemas/ResponseStatus"
+        applicationId:
+          type: string
+    OutreachLogListResponse:
+      type: object
+      properties:
+        logs:
+          type: array
+          items:
+            $ref: "#/components/schemas/OutreachLog"

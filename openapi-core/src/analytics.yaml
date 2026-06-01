@@ -18,6 +18,16 @@ paths:
       operationId: ListRejectionPatterns
       summary: Analyze rejection patterns
       tags: [Analytics]
+      parameters:
+        - name: stage
+          in: query
+          schema:
+            type: string
+        - name: since
+          in: query
+          schema:
+            type: string
+            format: date
       responses:
         "200":
           description: Patterns
@@ -25,6 +35,28 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PatternListResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /analytics/rejections/records/{rejectionId}:
+    get:
+      operationId: GetRejectionRecord
+      summary: Get a single rejection record
+      tags: [Analytics]
+      parameters:
+        - $ref: "#/components/parameters/RejectionId"
+      responses:
+        "200":
+          description: Rejection record
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RejectionRecord"
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
@@ -53,12 +85,71 @@ paths:
           $ref: "#/components/responses/Forbidden"
         "404":
           $ref: "#/components/responses/NotFound"
+  /analytics/reports:
+    post:
+      operationId: GenerateAnalyticsReport
+      summary: Generate an analytics report for a date range
+      tags: [Analytics]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GenerateAnalyticsReportRequest"
+      responses:
+        "201":
+          description: Report generated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnalyticsReport"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /analytics/reports/{reportId}:
+    get:
+      operationId: GetAnalyticsReport
+      summary: Retrieve a generated analytics report
+      tags: [Analytics]
+      parameters:
+        - $ref: "#/components/parameters/ReportId"
+      responses:
+        "200":
+          description: Analytics report
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnalyticsReport"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
 components:
   schemas:
     PatternListResponse:
       $ref: "analytics.schemas.yaml#/components/schemas/PatternListResponse"
     ProgressReport:
       $ref: "analytics.schemas.yaml#/components/schemas/ProgressReport"
+    RejectionRecord:
+      $ref: "analytics.schemas.yaml#/components/schemas/RejectionRecord"
+    AnalyticsReport:
+      $ref: "analytics.schemas.yaml#/components/schemas/AnalyticsReport"
+    GenerateAnalyticsReportRequest:
+      $ref: "analytics.schemas.yaml#/components/schemas/GenerateAnalyticsReportRequest"
+  parameters:
+    RejectionId:
+      $ref: "common/parameters.yaml#/components/parameters/RejectionId"
+    ReportId:
+      $ref: "common/parameters.yaml#/components/parameters/ReportId"
   securitySchemes:
     bearerAuth:
       $ref: "common/security.yaml#/components/securitySchemes/bearerAuth"

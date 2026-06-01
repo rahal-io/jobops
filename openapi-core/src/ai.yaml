@@ -1,0 +1,361 @@
+openapi: 3.1.0
+info:
+  title: jobops - AI Capability
+  version: 1.0.0
+  x-domain: aia
+  x-cli-modes: [batch]
+  description: |
+    Cross-cutting AI layer for job search: model configuration, workflow prompts,
+    unified inference, and agent runs that power evaluation, apply, resume tailoring,
+    outreach, and interview prep.
+
+    Other bounded contexts invoke AI via `POST /ai/runs` (async workflows) or
+    `POST /ai/inference` (direct LLM calls). Emits domain events such as
+    `AgentRunCompleted` for downstream handlers.
+  license:
+    name: MIT
+    identifier: MIT
+servers:
+  - url: https://api.jobops.dev
+security:
+  - bearerAuth: []
+paths:
+  /ai/models:
+    get:
+      operationId: ListAiModels
+      summary: List configured AI models
+      tags: [Models]
+      responses:
+        "200":
+          description: Models
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ModelListResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /ai/models/default:
+    put:
+      operationId: SetDefaultAiModel
+      summary: Set the default model for agent runs
+      tags: [Models]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateDefaultModelRequest"
+      responses:
+        "200":
+          description: Default model updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AiModel"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /ai/prompts:
+    get:
+      operationId: ListAiPrompts
+      summary: List prompt templates for job-search workflows
+      tags: [Prompts]
+      parameters:
+        - name: workflow
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/JobSearchWorkflow"
+      responses:
+        "200":
+          description: Prompt templates
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PromptListResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    post:
+      operationId: CreateAiPrompt
+      summary: Create a custom prompt template
+      tags: [Prompts]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePromptRequest"
+      responses:
+        "201":
+          description: Prompt created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PromptTemplate"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /ai/prompts/{promptId}:
+    get:
+      operationId: GetAiPrompt
+      summary: Get a prompt template by ID
+      tags: [Prompts]
+      parameters:
+        - $ref: "#/components/parameters/PromptId"
+      responses:
+        "200":
+          description: Prompt template
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PromptTemplate"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      operationId: UpdateAiPrompt
+      summary: Update a prompt template
+      tags: [Prompts]
+      parameters:
+        - $ref: "#/components/parameters/PromptId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdatePromptRequest"
+      responses:
+        "200":
+          description: Prompt updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PromptTemplate"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      operationId: DeleteAiPrompt
+      summary: Delete a prompt template
+      tags: [Prompts]
+      parameters:
+        - $ref: "#/components/parameters/PromptId"
+      responses:
+        "204":
+          description: Prompt deleted
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /ai/inference:
+    post:
+      operationId: CreateAiInference
+      summary: Run a direct inference (chat, completion, or embedding)
+      tags: [Inference]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InferenceRequest"
+      responses:
+        "200":
+          description: Inference result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InferenceResult"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /ai/runs:
+    get:
+      operationId: ListAiRuns
+      summary: List agent runs
+      tags: [Runs]
+      parameters:
+        - name: workflow
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/JobSearchWorkflow"
+        - $ref: "#/components/parameters/Cursor"
+        - $ref: "#/components/parameters/Limit"
+      responses:
+        "200":
+          description: Agent runs
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AgentRunListResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    post:
+      operationId: CreateAiRun
+      summary: Start an agent run for a job-search workflow
+      description: |
+        Orchestrates AI work for a bounded context, e.g. `evaluate_job` (fit scoring),
+        `tailor_resume`, `apply_form` (application answers), `outreach_message`,
+        `interview_prep`, or `company_research`.
+      tags: [Runs]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateAgentRunRequest"
+      responses:
+        "202":
+          description: Run accepted (may complete asynchronously)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AgentRun"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /ai/runs/{runId}:
+    get:
+      operationId: GetAiRun
+      summary: Get agent run status and result
+      tags: [Runs]
+      parameters:
+        - $ref: "#/components/parameters/RunId"
+      responses:
+        "200":
+          description: Agent run
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AgentRun"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /ai/usage:
+    get:
+      operationId: GetAiUsage
+      summary: Get AI token and run usage summary
+      tags: [Usage]
+      responses:
+        "200":
+          description: Usage summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UsageSummary"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+components:
+  schemas:
+    JobSearchWorkflow:
+      $ref: "ai.schemas.yaml#/components/schemas/JobSearchWorkflow"
+    AiModel:
+      $ref: "ai.schemas.yaml#/components/schemas/AiModel"
+    ModelListResponse:
+      $ref: "ai.schemas.yaml#/components/schemas/ModelListResponse"
+    UpdateDefaultModelRequest:
+      $ref: "ai.schemas.yaml#/components/schemas/UpdateDefaultModelRequest"
+    PromptTemplate:
+      $ref: "ai.schemas.yaml#/components/schemas/PromptTemplate"
+    PromptListResponse:
+      $ref: "ai.schemas.yaml#/components/schemas/PromptListResponse"
+    CreatePromptRequest:
+      $ref: "ai.schemas.yaml#/components/schemas/CreatePromptRequest"
+    UpdatePromptRequest:
+      $ref: "ai.schemas.yaml#/components/schemas/UpdatePromptRequest"
+    InferenceRequest:
+      $ref: "ai.schemas.yaml#/components/schemas/InferenceRequest"
+    InferenceResult:
+      $ref: "ai.schemas.yaml#/components/schemas/InferenceResult"
+    CreateAgentRunRequest:
+      $ref: "ai.schemas.yaml#/components/schemas/CreateAgentRunRequest"
+    AgentRun:
+      $ref: "ai.schemas.yaml#/components/schemas/AgentRun"
+    AgentRunListResponse:
+      $ref: "ai.schemas.yaml#/components/schemas/AgentRunListResponse"
+    UsageSummary:
+      $ref: "ai.schemas.yaml#/components/schemas/UsageSummary"
+  parameters:
+    PromptId:
+      $ref: "common/parameters.yaml#/components/parameters/PromptId"
+    RunId:
+      $ref: "common/parameters.yaml#/components/parameters/RunId"
+    Cursor:
+      $ref: "common/parameters.yaml#/components/parameters/Cursor"
+    Limit:
+      $ref: "common/parameters.yaml#/components/parameters/Limit"
+  securitySchemes:
+    bearerAuth:
+      $ref: "common/security.yaml#/components/securitySchemes/bearerAuth"
+  responses:
+    BadRequest:
+      $ref: "common/responses.yaml#/components/responses/BadRequest"
+    Unauthorized:
+      $ref: "common/responses.yaml#/components/responses/Unauthorized"
+    Forbidden:
+      $ref: "common/responses.yaml#/components/responses/Forbidden"
+    NotFound:
+      $ref: "common/responses.yaml#/components/responses/NotFound"

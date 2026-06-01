@@ -1,0 +1,167 @@
+openapi: 3.1.0
+info:
+  title: jobops - Pipeline Schemas
+  version: 1.0.0
+  x-domain: pip
+  description: Application pipeline, status history, and follow-ups.
+  license:
+    name: MIT
+    identifier: MIT
+paths: {}
+servers:
+  - url: https://api.jobops.dev
+components:
+  schemas:
+    ApplicationStatus:
+      type: string
+      enum: [Pending, Applied, Interviewing, Offered, Rejected, Withdrawn]
+    PipelineStage:
+      type: string
+      enum:
+        - applied
+        - phone_screen
+        - technical
+        - onsite
+        - offer
+        - rejected
+        - withdrawn
+    StatusHistoryEntry:
+      type: object
+      required: [status, changedAt]
+      properties:
+        status:
+          $ref: "#/components/schemas/ApplicationStatus"
+        stage:
+          $ref: "#/components/schemas/PipelineStage"
+        changedAt:
+          type: string
+          format: date-time
+        note:
+          type: string
+    Application:
+      x-entity: true
+      type: object
+      required: [id, jobPostingId, companyId, appliedDate, status]
+      properties:
+        id:
+          type: string
+        jobPostingId:
+          type: string
+        companyId:
+          type: string
+        resumeId:
+          type: string
+        submissionId:
+          type: string
+          description: Latest application-execution submission id
+        appliedDate:
+          type: string
+          format: date
+        status:
+          $ref: "#/components/schemas/ApplicationStatus"
+        stage:
+          $ref: "#/components/schemas/PipelineStage"
+        statusHistory:
+          type: array
+          items:
+            $ref: "#/components/schemas/StatusHistoryEntry"
+        lastActivityAt:
+          type: string
+          format: date-time
+        notes:
+          type: string
+        dedupeKey:
+          type: string
+          description: Normalized job URL or portal key for deduplication
+    ApplicationListResponse:
+      type: object
+      properties:
+        applications:
+          type: array
+          items:
+            $ref: "#/components/schemas/Application"
+        nextCursor:
+          type: string
+    CreateApplicationRequest:
+      type: object
+      required: [jobPostingId, companyId, resumeId]
+      properties:
+        jobPostingId:
+          type: string
+        companyId:
+          type: string
+        resumeId:
+          type: string
+        notes:
+          type: string
+        dedupeKey:
+          type: string
+    PatchApplicationRequest:
+      type: object
+      properties:
+        resumeId:
+          type: string
+        notes:
+          type: string
+        submissionId:
+          type: string
+    StatusUpdateRequest:
+      type: object
+      required: [status]
+      properties:
+        status:
+          $ref: "#/components/schemas/ApplicationStatus"
+        stage:
+          $ref: "#/components/schemas/PipelineStage"
+        note:
+          type: string
+    FollowUp:
+      x-entity: true
+      type: object
+      required: [id, applicationId, dueDate]
+      properties:
+        id:
+          type: string
+        applicationId:
+          type: string
+        dueDate:
+          type: string
+          format: date
+        note:
+          type: string
+        completed:
+          type: boolean
+          default: false
+        completedAt:
+          type: string
+          format: date-time
+    ScheduleFollowUpRequest:
+      type: object
+      required: [applicationId, dueDate]
+      properties:
+        applicationId:
+          type: string
+        dueDate:
+          type: string
+          format: date
+        note:
+          type: string
+    PipelineHealthEntry:
+      type: object
+      required: [applicationId, daysSinceActivity]
+      properties:
+        applicationId:
+          type: string
+        jobPostingId:
+          type: string
+        status:
+          $ref: "#/components/schemas/ApplicationStatus"
+        daysSinceActivity:
+          type: integer
+    PipelineHealthResponse:
+      type: object
+      properties:
+        staleApplications:
+          type: array
+          items:
+            $ref: "#/components/schemas/PipelineHealthEntry"

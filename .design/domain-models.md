@@ -340,110 +340,51 @@ paths:
                 $ref: '#/components/schemas/JobPosting'
 ```
 
-#### Application Management API
+#### Pipeline & Tracking API
+
+Canonical spec: [`openapi-core/src/pipeline.yaml`](../openapi-core/src/pipeline.yaml). Pipeline entries reference `jobPostingId` and `companyId` (not embedded company names).
 
 ```yaml
 openapi: 3.1.0
 info:
-  title: Application Management API
+  title: Pipeline & Tracking API
   version: 1.0.0
 servers:
-  - url: https://api.jobops.example.com/applications
-tags:
-  - Application
-components:
-  securitySchemes:
-    BearerAuth: { type: http, scheme: bearer }
-  schemas:
-    Application:
-      type: object
-      properties:
-        id: { type: string }
-        jobId: { type: string }
-        company: { type: string }
-        appliedDate: { type: string, format: date }
-        status: { type: string, enum: [Applied, Interviewing, Offered, Rejected] }
-        resumeId: { type: string }
-        notes: { type: string }
-      required: [id, jobId, company, appliedDate, status]
-    CreateApplicationRequest:
-      type: object
-      properties:
-        jobId: { type: string }
-        resumeId: { type: string }
-        company: { type: string }
-      required: [jobId, resumeId, company]
-    StatusUpdate:
-      type: object
-      properties:
-        status: { type: string, enum: [Applied, Interviewing, Offered, Rejected] }
-      required: [status]
-    FollowUpRequest:
-      type: object
-      properties:
-        applicationId: { type: string }
-        date: { type: string, format: date }
-        note: { type: string }
-      required: [applicationId, date]
+  - url: https://api.jobops.dev/pipeline
 paths:
-  /applications:
-    get:
-      tags: [Application]
-      summary: List all user applications
-      security: [BearerAuth]
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items: { $ref: '#/components/schemas/Application' }
-    post:
-      tags: [Application]
-      summary: Submit a new job application
-      security: [BearerAuth]
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateApplicationRequest'
-      responses:
-        '201':
-          content:
-            application/json:
-              schema: { $ref: '#/components/schemas/Application' }
-  /applications/{appId}/status:
-    put:
-      tags: [Application]
-      summary: Update application status
-      security: [BearerAuth]
-      parameters:
-        - name: appId
-          in: path
-          schema: { type: string }
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/StatusUpdate'
-      responses:
-        '200':
-          content:
-            application/json:
-              schema: { $ref: '#/components/schemas/Application' }
-  /followups:
-    post:
-      tags: [Application]
-      summary: Schedule a follow-up for an application
-      security: [BearerAuth]
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/FollowUpRequest'
-      responses:
-        '202':
-          description: Follow-up scheduled
+  /pipeline/applications:
+    get: { summary: List pipeline applications }
+    post: { summary: Create pipeline application }
+  /pipeline/applications/{appId}:
+    get: { summary: Get application }
+    patch: { summary: Update metadata / submission link }
+  /pipeline/applications/{appId}/status:
+    put: { summary: Update status and optional stage }
+  /pipeline/followups:
+    post: { summary: Schedule follow-up }
+  /pipeline/health:
+    get: { summary: Stale applications report }
+```
+
+#### Application Execution API
+
+Canonical spec: [`openapi-core/src/application-execution.yaml`](../openapi-core/src/application-execution.yaml). Form submission is decoupled from pipeline status; link via `applicationId` and optional `pipeline.Application.submissionId`.
+
+```yaml
+openapi: 3.1.0
+info:
+  title: Application Execution API
+  version: 1.0.0
+servers:
+  - url: https://api.jobops.dev/execution
+paths:
+  /execution/submissions:
+    get: { summary: List submissions (filter by applicationId) }
+    post: { summary: Submit application form (async) }
+  /execution/submissions/{submissionId}:
+    get: { summary: Get submission status and result }
+  /execution/submissions/{submissionId}/retry:
+    post: { summary: Retry failed submission }
 ```
 
 #### Resume Management API

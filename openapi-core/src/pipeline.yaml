@@ -1,0 +1,238 @@
+openapi: 3.1.0
+info:
+  title: jobops - Pipeline & Tracking
+  version: 1.0.0
+  x-domain: pip
+  x-cli-modes: [pipeline, tracker, followup, batch]
+  description: |
+    Source of truth for job applications: pipeline entries, status transitions,
+    follow-ups, and deduplication metadata.
+  license:
+    name: MIT
+    identifier: MIT
+servers:
+  - url: https://api.jobops.dev
+security:
+  - bearerAuth: []
+paths:
+  /pipeline/applications:
+    get:
+      operationId: ListPipelineApplications
+      summary: List user applications in the pipeline
+      tags: [Pipeline]
+      parameters:
+        - $ref: "#/components/parameters/Cursor"
+        - $ref: "#/components/parameters/Limit"
+        - name: status
+          in: query
+          schema:
+            $ref: "#/components/schemas/ApplicationStatus"
+      responses:
+        "200":
+          description: Application list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApplicationListResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    post:
+      operationId: CreatePipelineApplication
+      summary: Add a job to the pipeline
+      tags: [Pipeline]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateApplicationRequest"
+      responses:
+        "201":
+          description: Application created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Application"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /pipeline/applications/{appId}:
+    get:
+      operationId: GetPipelineApplication
+      summary: Get a single pipeline application
+      tags: [Pipeline]
+      parameters:
+        - $ref: "#/components/parameters/AppId"
+      responses:
+        "200":
+          description: Application
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Application"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      operationId: PatchPipelineApplication
+      summary: Update pipeline application metadata
+      tags: [Pipeline]
+      parameters:
+        - $ref: "#/components/parameters/AppId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchApplicationRequest"
+      responses:
+        "200":
+          description: Updated application
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Application"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /pipeline/applications/{appId}/status:
+    put:
+      operationId: UpdatePipelineApplicationStatus
+      summary: Update application status and optional stage
+      tags: [Pipeline]
+      parameters:
+        - $ref: "#/components/parameters/AppId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StatusUpdateRequest"
+      responses:
+        "200":
+          description: Updated application
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Application"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /pipeline/followups:
+    post:
+      operationId: SchedulePipelineFollowUp
+      summary: Schedule a follow-up for an application
+      tags: [Pipeline]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ScheduleFollowUpRequest"
+      responses:
+        "201":
+          description: Follow-up scheduled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FollowUp"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /pipeline/health:
+    get:
+      operationId: ListPipelineHealth
+      summary: List stale applications needing attention
+      tags: [Pipeline]
+      parameters:
+        - name: staleDays
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 7
+      responses:
+        "200":
+          description: Stale application health report
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PipelineHealthResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+components:
+  schemas:
+    ApplicationStatus:
+      $ref: "pipeline.schemas.yaml#/components/schemas/ApplicationStatus"
+    Application:
+      $ref: "pipeline.schemas.yaml#/components/schemas/Application"
+    ApplicationListResponse:
+      $ref: "pipeline.schemas.yaml#/components/schemas/ApplicationListResponse"
+    CreateApplicationRequest:
+      $ref: "pipeline.schemas.yaml#/components/schemas/CreateApplicationRequest"
+    PatchApplicationRequest:
+      $ref: "pipeline.schemas.yaml#/components/schemas/PatchApplicationRequest"
+    StatusUpdateRequest:
+      $ref: "pipeline.schemas.yaml#/components/schemas/StatusUpdateRequest"
+    ScheduleFollowUpRequest:
+      $ref: "pipeline.schemas.yaml#/components/schemas/ScheduleFollowUpRequest"
+    FollowUp:
+      $ref: "pipeline.schemas.yaml#/components/schemas/FollowUp"
+    PipelineHealthResponse:
+      $ref: "pipeline.schemas.yaml#/components/schemas/PipelineHealthResponse"
+  parameters:
+    AppId:
+      $ref: "common/parameters.yaml#/components/parameters/AppId"
+    Cursor:
+      $ref: "common/parameters.yaml#/components/parameters/Cursor"
+    Limit:
+      $ref: "common/parameters.yaml#/components/parameters/Limit"
+  securitySchemes:
+    bearerAuth:
+      $ref: "common/security.yaml#/components/securitySchemes/bearerAuth"
+  responses:
+    BadRequest:
+      $ref: "common/responses.yaml#/components/responses/BadRequest"
+    Unauthorized:
+      $ref: "common/responses.yaml#/components/responses/Unauthorized"
+    Forbidden:
+      $ref: "common/responses.yaml#/components/responses/Forbidden"
+    NotFound:
+      $ref: "common/responses.yaml#/components/responses/NotFound"

@@ -57,12 +57,36 @@ paths:
           $ref: "#/components/responses/Forbidden"
         "404":
           $ref: "#/components/responses/NotFound"
+  /companies/{companyId}/sentiment:
+    post:
+      operationId: AnalyzeCompanySentiment
+      summary: Analyze sentiment from reviews and news
+      tags: [Company]
+      parameters:
+        - $ref: "#/components/parameters/CompanyId"
+      responses:
+        "200":
+          description: Sentiment analysis
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CompanySentimentResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
 components:
   schemas:
     CompanyProfile:
       $ref: "company.schemas.yaml#/components/schemas/CompanyProfile"
     NewsListResponse:
       $ref: "company.schemas.yaml#/components/schemas/NewsListResponse"
+    CompanySentimentResponse:
+      $ref: "company.schemas.yaml#/components/schemas/CompanySentimentResponse"
   parameters:
     CompanyId:
       $ref: "common/parameters.yaml#/components/parameters/CompanyId"

@@ -13,10 +13,102 @@ servers:
 security:
   - bearerAuth: []
 paths:
-  /offers/evaluate:
+  /offers:
+    get:
+      operationId: ListJobOffers
+      summary: List job offers
+      tags: [Offer]
+      parameters:
+        - $ref: "#/components/parameters/Cursor"
+        - $ref: "#/components/parameters/Limit"
+      responses:
+        "200":
+          description: Offers
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobOfferListResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    post:
+      operationId: CreateJobOffer
+      summary: Record a received job offer
+      tags: [Offer]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateJobOfferRequest"
+      responses:
+        "201":
+          description: Offer created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobOffer"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /offers/{offerId}:
+    get:
+      operationId: GetJobOffer
+      summary: Get a job offer by id
+      tags: [Offer]
+      parameters:
+        - $ref: "#/components/parameters/OfferId"
+      responses:
+        "200":
+          description: Offer
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobOffer"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /offers/{offerId}/evaluate:
     post:
       operationId: EvaluateOffer
-      summary: Evaluate a job offer package
+      summary: Evaluate a persisted job offer package
+      tags: [Offer]
+      parameters:
+        - $ref: "#/components/parameters/OfferId"
+      responses:
+        "200":
+          description: Offer evaluation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OfferEvaluation"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /offers/evaluate:
+    post:
+      operationId: EvaluateOfferPackage
+      summary: Evaluate compensation without persisting an offer
       tags: [Offer]
       requestBody:
         required: true
@@ -39,12 +131,57 @@ paths:
           $ref: "#/components/responses/Forbidden"
         "404":
           $ref: "#/components/responses/NotFound"
+  /offers/compare:
+    post:
+      operationId: CompareJobOffers
+      summary: Compare multiple offers side by side
+      tags: [Offer]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CompareOffersRequest"
+      responses:
+        "200":
+          description: Comparison result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CompareOffersResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
 components:
   schemas:
+    JobOffer:
+      $ref: "offer.schemas.yaml#/components/schemas/JobOffer"
+    JobOfferListResponse:
+      $ref: "offer.schemas.yaml#/components/schemas/JobOfferListResponse"
+    CreateJobOfferRequest:
+      $ref: "offer.schemas.yaml#/components/schemas/CreateJobOfferRequest"
+    OfferEvaluation:
+      $ref: "offer.schemas.yaml#/components/schemas/OfferEvaluation"
     OfferEvaluationRequest:
       $ref: "offer.schemas.yaml#/components/schemas/OfferEvaluationRequest"
     OfferScore:
       $ref: "offer.schemas.yaml#/components/schemas/OfferScore"
+    CompareOffersRequest:
+      $ref: "offer.schemas.yaml#/components/schemas/CompareOffersRequest"
+    CompareOffersResponse:
+      $ref: "offer.schemas.yaml#/components/schemas/CompareOffersResponse"
+  parameters:
+    OfferId:
+      $ref: "common/parameters.yaml#/components/parameters/OfferId"
+    Cursor:
+      $ref: "common/parameters.yaml#/components/parameters/Cursor"
+    Limit:
+      $ref: "common/parameters.yaml#/components/parameters/Limit"
   securitySchemes:
     bearerAuth:
       $ref: "common/security.yaml#/components/securitySchemes/bearerAuth"

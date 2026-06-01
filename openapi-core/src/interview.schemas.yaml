@@ -3,6 +3,7 @@ info:
   title: jobops - Interview Schemas
   version: 1.0.0
   x-domain: int
+  description: Practice sessions, questions, answers, feedback, and STAR stories.
   license:
     name: MIT
     identifier: MIT
@@ -11,6 +12,12 @@ servers:
   - url: https://api.jobops.dev
 components:
   schemas:
+    QuestionTopic:
+      type: string
+      enum: [behavioral, technical, system_design, culture, compensation, other]
+    DifficultyLevel:
+      type: string
+      enum: [easy, medium, hard]
     InterviewQuestion:
       type: object
       required: [id, text]
@@ -20,7 +27,9 @@ components:
         text:
           type: string
         topic:
-          type: string
+          $ref: "#/components/schemas/QuestionTopic"
+        difficulty:
+          $ref: "#/components/schemas/DifficultyLevel"
     QuestionListResponse:
       type: object
       properties:
@@ -28,15 +37,70 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/InterviewQuestion"
+    PracticeAnswer:
+      type: object
+      required: [questionId, answerText]
+      properties:
+        questionId:
+          type: string
+        answerText:
+          type: string
+        durationSeconds:
+          type: integer
+    InterviewFeedback:
+      type: object
+      properties:
+        score:
+          type: number
+          format: float
+        strengths:
+          type: array
+          items:
+            type: string
+        improvements:
+          type: array
+          items:
+            type: string
+        suggestedFollowUp:
+          type: string
+    SessionAnswer:
+      type: object
+      properties:
+        question:
+          $ref: "#/components/schemas/InterviewQuestion"
+        answer:
+          $ref: "#/components/schemas/PracticeAnswer"
+        feedback:
+          $ref: "#/components/schemas/InterviewFeedback"
     InterviewSession:
+      x-entity: true
       type: object
       required: [sessionId, status]
       properties:
         sessionId:
           type: string
+        jobId:
+          type: string
         status:
           type: string
           enum: [Active, Completed]
+        answers:
+          type: array
+          items:
+            $ref: "#/components/schemas/SessionAnswer"
+        overallFeedback:
+          $ref: "#/components/schemas/InterviewFeedback"
+    StartInterviewSessionRequest:
+      type: object
+      properties:
+        jobId:
+          type: string
+    SubmitPracticeAnswerRequest:
+      type: object
+      required: [answer]
+      properties:
+        answer:
+          $ref: "#/components/schemas/PracticeAnswer"
     StarStory:
       type: object
       properties:

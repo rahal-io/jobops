@@ -3,6 +3,7 @@ info:
   title: jobops - Analytics Schemas
   version: 1.0.0
   x-domain: anl
+  description: Rejection patterns, goals, interview feedback, and analytics reports.
   license:
     name: MIT
     identifier: MIT
@@ -11,6 +12,43 @@ servers:
   - url: https://api.jobops.dev
 components:
   schemas:
+    AnalyticsGoalStatus:
+      type: string
+      enum: [active, achieved, paused, abandoned]
+    PatternStats:
+      type: object
+      required: [pattern, count]
+      properties:
+        pattern:
+          type: string
+        count:
+          type: integer
+        percentage:
+          type: number
+          format: float
+    Trend:
+      type: object
+      required: [metric, direction]
+      properties:
+        metric:
+          type: string
+        direction:
+          type: string
+          enum: [up, down, flat]
+        changePercent:
+          type: number
+          format: float
+    MetricSnapshot:
+      type: object
+      required: [metric, value, capturedAt]
+      properties:
+        metric:
+          type: string
+        value:
+          type: number
+        capturedAt:
+          type: string
+          format: date-time
     PatternReport:
       type: object
       required: [pattern, count]
@@ -19,6 +57,8 @@ components:
           type: string
         count:
           type: integer
+        stats:
+          $ref: "#/components/schemas/PatternStats"
     PatternListResponse:
       type: object
       properties:
@@ -34,3 +74,127 @@ components:
           type: string
         value:
           type: number
+        trends:
+          type: array
+          items:
+            $ref: "#/components/schemas/Trend"
+        snapshots:
+          type: array
+          items:
+            $ref: "#/components/schemas/MetricSnapshot"
+    RejectionRecord:
+      x-entity: true
+      type: object
+      required: [id, applicationId, reason, stage, rejectedAt]
+      properties:
+        id:
+          type: string
+        applicationId:
+          type: string
+        jobPostingId:
+          type: string
+        reason:
+          type: string
+        stage:
+          type: string
+        rejectedAt:
+          type: string
+          format: date-time
+        notes:
+          type: string
+    RejectionRecordListResponse:
+      type: object
+      properties:
+        records:
+          type: array
+          items:
+            $ref: "#/components/schemas/RejectionRecord"
+    AnalyticsGoal:
+      x-entity: true
+      type: object
+      required: [id, title, status]
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        target:
+          type: string
+        targetDate:
+          type: string
+          format: date
+        status:
+          $ref: "#/components/schemas/AnalyticsGoalStatus"
+        careerGoalId:
+          type: string
+          description: Optional link to strategy CareerGoal id
+    InterviewFeedbackRecord:
+      type: object
+      required: [id, applicationId]
+      properties:
+        id:
+          type: string
+        applicationId:
+          type: string
+        sessionId:
+          type: string
+        overallScore:
+          type: number
+          format: float
+        dimensionScores:
+          type: object
+          additionalProperties:
+            type: number
+        feedback:
+          type: string
+        recordedAt:
+          type: string
+          format: date-time
+    ReportSection:
+      type: object
+      required: [title, body]
+      properties:
+        title:
+          type: string
+        body:
+          type: string
+        metrics:
+          type: array
+          items:
+            $ref: "#/components/schemas/MetricSnapshot"
+    AnalyticsReport:
+      x-entity: true
+      type: object
+      required: [id, periodStart, periodEnd, generatedAt]
+      properties:
+        id:
+          type: string
+        periodStart:
+          type: string
+          format: date
+        periodEnd:
+          type: string
+          format: date
+        generatedAt:
+          type: string
+          format: date-time
+        sections:
+          type: array
+          items:
+            $ref: "#/components/schemas/ReportSection"
+    GenerateAnalyticsReportRequest:
+      type: object
+      required: [periodStart, periodEnd]
+      properties:
+        periodStart:
+          type: string
+          format: date
+        periodEnd:
+          type: string
+          format: date
+        includeRejections:
+          type: boolean
+          default: true
+        includeProgression:
+          type: boolean
+          default: true

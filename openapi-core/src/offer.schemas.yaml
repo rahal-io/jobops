@@ -3,6 +3,7 @@ info:
   title: jobops - Offer Schemas
   version: 1.0.0
   x-domain: off
+  description: Job offers, compensation packages, and offer evaluations.
   license:
     name: MIT
     identifier: MIT
@@ -11,22 +12,165 @@ servers:
   - url: https://api.jobops.dev
 components:
   schemas:
-    OfferEvaluationRequest:
+    PayPeriod:
+      type: string
+      enum: [annual, monthly, hourly]
+    Salary:
+      $ref: "common/primitives.yaml#/components/schemas/Money"
+    EquityGrant:
       type: object
-      required: [baseSalary]
+      properties:
+        shares:
+          type: number
+        vestingYears:
+          type: number
+        estimatedValue:
+          type: number
+        currency:
+          type: string
+    BenefitItem:
+      type: object
+      required: [type, description]
+      properties:
+        type:
+          type: string
+          enum: [health, dental, vision, retirement, pto, remote, other]
+        description:
+          type: string
+        estimatedValue:
+          type: number
+    CompensationPackage:
+      type: object
       properties:
         baseSalary:
-          type: number
+          $ref: "#/components/schemas/Salary"
         bonus:
-          type: number
-        equityValue:
-          type: number
+          $ref: "#/components/schemas/Salary"
+        equity:
+          $ref: "#/components/schemas/EquityGrant"
         benefits:
           type: array
           items:
-            type: string
+            $ref: "#/components/schemas/BenefitItem"
+    LocationFactor:
+      type: object
+      properties:
         location:
           type: string
+        colIndex:
+          type: number
+          description: Cost-of-living index relative to baseline
+        remote:
+          type: boolean
+    OfferDimension:
+      type: string
+      enum: [compensation, benefits, equity, location, culture, growth, workLife]
+    OfferDimensionScore:
+      type: object
+      required: [dimension, grade]
+      properties:
+        dimension:
+          $ref: "#/components/schemas/OfferDimension"
+        grade:
+          type: string
+          example: B
+        score:
+          type: number
+          format: float
+    OfferScoreBreakdown:
+      type: object
+      properties:
+        compensation:
+          $ref: "#/components/schemas/OfferDimensionScore"
+        benefits:
+          $ref: "#/components/schemas/OfferDimensionScore"
+        equity:
+          $ref: "#/components/schemas/OfferDimensionScore"
+        location:
+          $ref: "#/components/schemas/OfferDimensionScore"
+        culture:
+          $ref: "#/components/schemas/OfferDimensionScore"
+        growth:
+          $ref: "#/components/schemas/OfferDimensionScore"
+        workLife:
+          $ref: "#/components/schemas/OfferDimensionScore"
+    JobOffer:
+      x-entity: true
+      type: object
+      required: [id, applicationId, companyId, receivedAt, compensation]
+      properties:
+        id:
+          type: string
+        applicationId:
+          type: string
+        companyId:
+          type: string
+        jobPostingId:
+          type: string
+        receivedAt:
+          type: string
+          format: date
+        compensation:
+          $ref: "#/components/schemas/CompensationPackage"
+        locationFactor:
+          $ref: "#/components/schemas/LocationFactor"
+        notes:
+          type: string
+    JobOfferListResponse:
+      type: object
+      properties:
+        offers:
+          type: array
+          items:
+            $ref: "#/components/schemas/JobOffer"
+    CreateJobOfferRequest:
+      type: object
+      required: [applicationId, companyId, compensation]
+      properties:
+        applicationId:
+          type: string
+        companyId:
+          type: string
+        jobPostingId:
+          type: string
+        receivedAt:
+          type: string
+          format: date
+        compensation:
+          $ref: "#/components/schemas/CompensationPackage"
+        locationFactor:
+          $ref: "#/components/schemas/LocationFactor"
+        notes:
+          type: string
+    OfferEvaluation:
+      x-entity: true
+      type: object
+      required: [id, offerId, overallGrade]
+      properties:
+        id:
+          type: string
+        offerId:
+          type: string
+        overallGrade:
+          type: string
+          description: Overall grade A–F
+        breakdown:
+          $ref: "#/components/schemas/OfferScoreBreakdown"
+        evaluatedAt:
+          type: string
+          format: date-time
+        recommendation:
+          type: string
+    OfferEvaluationRequest:
+      type: object
+      description: Ad-hoc evaluation without persisted offer
+      properties:
+        offerId:
+          type: string
+        compensation:
+          $ref: "#/components/schemas/CompensationPackage"
+        locationFactor:
+          $ref: "#/components/schemas/LocationFactor"
     OfferScore:
       type: object
       required: [score]
@@ -35,5 +179,28 @@ components:
           type: string
           description: Overall grade A–F
         breakdown:
-          type: object
-          additionalProperties: true
+          $ref: "#/components/schemas/OfferScoreBreakdown"
+        evaluationId:
+          type: string
+    CompareOffersRequest:
+      type: object
+      required: [offerIds]
+      properties:
+        offerIds:
+          type: array
+          minItems: 2
+          items:
+            type: string
+    CompareOffersResponse:
+      type: object
+      properties:
+        offers:
+          type: array
+          items:
+            $ref: "#/components/schemas/JobOffer"
+        evaluations:
+          type: array
+          items:
+            $ref: "#/components/schemas/OfferEvaluation"
+        recommendedOfferId:
+          type: string
