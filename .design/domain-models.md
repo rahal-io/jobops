@@ -1,10 +1,10 @@
-# Domain Model for Career-Ops
+# Domain Model for jobops
 
-**Executive Summary:** *career-ops* is an AI-driven job search “command center” decomposed into multiple bounded contexts, each encapsulating a cohesive subset of the job-search workflow. Using Domain-Driven Design (DDD) principles, we define contexts that map to business capabilities such as discovering opportunities, managing applications, generating resumes, preparing for interviews, and so on【10†L93-L100】.  Each context has its own ubiquitous language and model, minimizing shared state and coupling. The architecture leans on microservices (or a modular monolith) with event-driven integration and AI agents (sub-agents) per domain.  This report outlines the context map, detailed context decomposition (entities, aggregates, services, commands/events), context interactions, mapping of user modes to contexts, suggested architecture patterns, and potential boundary risks.  
+**Executive Summary:** *jobops* is an AI-driven job search “command center” decomposed into multiple bounded contexts, each encapsulating a cohesive subset of the job-search workflow. Using Domain-Driven Design (DDD) principles, we define contexts that map to business capabilities such as discovering opportunities, managing applications, generating resumes, preparing for interviews, and so on【10†L93-L100】.  Each context has its own ubiquitous language and model, minimizing shared state and coupling. The architecture leans on microservices (or a modular monolith) with event-driven integration and AI agents (sub-agents) per domain.  This report outlines the context map, detailed context decomposition (entities, aggregates, services, commands/events), context interactions, mapping of user modes to contexts, suggested architecture patterns, and potential boundary risks.  
 
 ### 1. High-Level Context Map
 
-【18†embed_image】 *Figure: Bounded contexts encapsulate distinct domain capabilities【10†L93-L100】.* The *career-ops* system is partitioned into the following bounded contexts, each aligned to a specific aspect of the job-search domain:
+【18†embed_image】 *Figure: Bounded contexts encapsulate distinct domain capabilities【10†L93-L100】.* The *jobops* system is partitioned into the following bounded contexts, each aligned to a specific aspect of the job-search domain:
 
 | **Context**               | **Description**                                                                          |
 |---------------------------|------------------------------------------------------------------------------------------|
@@ -171,7 +171,7 @@ flowchart LR
 
 Communication is mix of **synchronous REST/HTTP APIs** (for on-demand requests, e.g. fetching a company profile) and **asynchronous events** (for workflows and decoupling). For example, when a user submits an application, the Application context emits an `ApplicationSubmitted` event that downstream contexts (Analytics, Contacts, InterviewPrep) consume. This event-driven approach allows contexts to operate independently【15†L133-L139】. Each context acts as either an **upstream** or **downstream** party in interactions: e.g., UserProfile is upstream of OpportunityDiscovery (providing preferences), whereas Analytics is downstream of most events.
 
-### 4. Mapping to career-ops Modes
+### 4. Mapping to jobops Modes
 
 Each command-line mode maps to one or more bounded contexts as follows:
 
@@ -234,7 +234,7 @@ info:
   title: Opportunity Discovery API
   version: 1.0.0
 servers:
-  - url: https://api.career-ops.example.com/discovery
+  - url: https://api.jobops.example.com/discovery
 tags:
   - Opportunity
 components:
@@ -348,7 +348,7 @@ info:
   title: Application Management API
   version: 1.0.0
 servers:
-  - url: https://api.career-ops.example.com/applications
+  - url: https://api.jobops.example.com/applications
 tags:
   - Application
 components:
@@ -454,7 +454,7 @@ info:
   title: Resume Management API
   version: 1.0.0
 servers:
-  - url: https://api.career-ops.example.com/resumes
+  - url: https://api.jobops.example.com/resumes
 tags:
   - Resume
 components:
@@ -551,7 +551,7 @@ info:
   title: Company Research API
   version: 1.0.0
 servers:
-  - url: https://api.career-ops.example.com/companies
+  - url: https://api.jobops.example.com/companies
 tags:
   - Company
 components:
@@ -617,7 +617,7 @@ info:
   title: Interview Preparation API
   version: 1.0.0
 servers:
-  - url: https://api.career-ops.example.com/interview
+  - url: https://api.jobops.example.com/interview
 tags:
   - Interview
 components:
@@ -674,7 +674,7 @@ info:
   title: Contacts & Outreach API
   version: 1.0.0
 servers:
-  - url: https://api.career-ops.example.com/contacts
+  - url: https://api.jobops.example.com/contacts
 tags:
   - Contacts
 components:
@@ -744,7 +744,7 @@ info:
   title: Training & Projects API
   version: 1.0.0
 servers:
-  - url: https://api.career-ops.example.com/training
+  - url: https://api.jobops.example.com/training
 tags:
   - Training
 components:
@@ -820,7 +820,7 @@ info:
   title: Offer Evaluation API
   version: 1.0.0
 servers:
-  - url: https://api.career-ops.example.com/offers
+  - url: https://api.jobops.example.com/offers
 tags:
   - Offer
 components:
@@ -868,7 +868,7 @@ info:
   title: Analytics & Insights API
   version: 1.0.0
 servers:
-  - url: https://api.career-ops.example.com/analytics
+  - url: https://api.jobops.example.com/analytics
 tags:
   - Analytics
 components:

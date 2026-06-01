@@ -66,7 +66,7 @@ Each context encapsulates its own language and model (e.g. in **Job Evaluation**
 - **Events Produced:** `ApplicationSubmitted`, `SubmissionFailed`.  
 - **Events Consumed:** `JobEvaluated`, `ContactAdded` (maybe to CC a referral contact), `FollowUpScheduled`.  
 
-*Ubiquitous Language:* “When executing `/career-ops apply`, the **ApplicationForm** for job 123 was auto-filled and submitted by the agent【22†L688-L695】.” It does not itself score jobs or generate CVs, only manages submission.
+*Ubiquitous Language:* “When executing `/jobops apply`, the **ApplicationForm** for job 123 was auto-filled and submitted by the agent【22†L688-L695】.” It does not itself score jobs or generate CVs, only manages submission.
 
 ### Pipeline & Tracking
 - **Purpose:** Central “source of truth” for all applications. Tracks each target job and the status of its application (applied, interview scheduled, rejected, etc.), and schedules follow-ups. Ensures data integrity (no duplicates)【18†L159-L160】.  
@@ -105,7 +105,7 @@ Each context encapsulates its own language and model (e.g. in **Job Evaluation**
 - **Events Produced:** `ContactAdded`, `OutreachSent`.  
 - **Events Consumed:** `PipelineUpdated` (if a contact works at a target company), `ProfileUpdated`.  
 
-*Ubiquitous Language:* “Using `/career-ops contacto` we generated a LinkedIn outreach message to the recruiter contact”【22†L686-L694】. Contacts are managed independently of applications until an outreach is sent.
+*Ubiquitous Language:* “Using `/jobops contacto` we generated a LinkedIn outreach message to the recruiter contact”【22†L686-L694】. Contacts are managed independently of applications until an outreach is sent.
 
 ### Interview Preparation
 - **Purpose:** Build and manage a “story bank” (STAR-format career stories) and generate question lists and practice materials for interviews. Provide negotiation scripts.  
@@ -118,7 +118,7 @@ Each context encapsulates its own language and model (e.g. in **Job Evaluation**
 - **Events Produced:** `InterviewPrepared` (materials ready).  
 - **Events Consumed:** `JobEvaluated`, `CompanyInfoFound` (for company-specific questions), `ProfileUpdated`, `ApplicationStatusChanged` (e.g. when an interview is scheduled).  
 
-*Ubiquitous Language:* “Before calling `/career-ops interview-prep`, the system collected 5–10 **STAR** stories as a story bank【22†L590-L592】. Each interview prep includes those stories and negotiation tips relevant to the company’s profile.”
+*Ubiquitous Language:* “Before calling `/jobops interview-prep`, the system collected 5–10 **STAR** stories as a story bank【22†L590-L592】. Each interview prep includes those stories and negotiation tips relevant to the company’s profile.”
 
 ### Training & Projects
 - **Purpose:** Help the user evaluate learning resources and projects that improve skills or resume, aligned to career goals.  
@@ -131,7 +131,7 @@ Each context encapsulates its own language and model (e.g. in **Job Evaluation**
 - **Events Produced:** `CourseRecommended`, `ProjectAssigned`.  
 - **Events Consumed:** `ProfileUpdated`, `JobEvaluated` (to identify gaps).  
 
-*Ubiquitous Language:* “Using `/career-ops training`, the system evaluated an online AI course and found it aligns well with my *Data Science* skill gap. The project context similarly rates portfolio projects.” These are standalone tasks not tied to a specific job application.
+*Ubiquitous Language:* “Using `/jobops training`, the system evaluated an online AI course and found it aligns well with my *Data Science* skill gap. The project context similarly rates portfolio projects.” These are standalone tasks not tied to a specific job application.
 
 ### Career Strategy (North Star)
 - **Purpose:** Maintain the user’s overall career goals and identity (the “North Star” archetype), and ensure all activities align with these goals.  
@@ -169,7 +169,7 @@ Each context encapsulates its own language and model (e.g. in **Job Evaluation**
 - **Anti-Corruption Layers:** When integrating external sources (job portals, LinkedIn APIs), each context uses translation layers. For example, the raw data from an ATS API is mapped into our internal `JobListing` model; this ACL protects the rest of the system from external schema changes. Similarly, if we consumed the *CareerProfile* from a separate microservice, an ACL would translate its objects into our ubiquitous language.  
 - **Context Mapping:** The map could be roughly: *Opportunity Discovery* → *Job Evaluation* → *Pipeline*; *Job Evaluation* is upstream of *Pipeline*. *Career Profile* is a customer to all, feeding their models. *Interview Prep* and *Company Research* sit downstream of *Evaluation/Pipeline*. *Contact* is largely orthogonal but links into *Pipeline*. These relationships avoid cyclic dependencies and allow autonomy (e.g. *Evaluation* doesn’t reach directly into *Pipeline’s* model, it just emits events).
 
-# 4. Mapping to career-ops Modes
+# 4. Mapping to jobops Modes
 
 - `scan` → **Opportunity Discovery** (portal crawler).  
 - `oferta`, `ofertas` → **Job Evaluation** (score single/multiple offers)【19†L112-L116】.  
@@ -185,7 +185,7 @@ Each context encapsulates its own language and model (e.g. in **Job Evaluation**
 - `update` → **Career Strategy** (update profile/goals).  
 - `patterns` → **Analytics & Patterns** (analyze rejection patterns, not directly shown but implied by context).  
 
-For example, invoking `/career-ops scan` triggers the Opportunity Discovery context to fill the pipeline【22†L725-L733】, while `/career-ops apply` engages the Application Execution context【22†L686-L694】. The mode definitions in the docs align neatly with these bounded contexts.
+For example, invoking `/jobops scan` triggers the Opportunity Discovery context to fill the pipeline【22†L725-L733】, while `/jobops apply` engages the Application Execution context【22†L686-L694】. The mode definitions in the docs align neatly with these bounded contexts.
 
 # 5. Suggested Architecture
 
@@ -204,6 +204,6 @@ For example, invoking `/career-ops scan` triggers the Opportunity Discovery cont
 - **AI Hallucinations:** In an AI-driven system, make sure each context validates outputs (Human-in-the-Loop is key【18†L156-L164】). For example, if the *Resume Service* hallucinates skills, the *Pipeline* might catch it in a review step (i.e. treat "ResumeGenerated" as pending until approval).  
 - **Scalability Boundaries:** Some contexts (like *Opportunity Discovery* and *Evaluation*) will scale differently. Plan for horizontal scaling of the scanning/evaluation agents without affecting other services. Use circuit breakers or back-pressure to isolate slow contexts.  
 
-By adhering to DDD principles and defining these boundaries clearly, “career-ops” can evolve new modes or swap AI providers without collapsing into a tangled, monolithic agent. Each context has a single responsibility and communicates via explicit contracts (events/APIs)【17†L92-L100】【17†L169-L174】, making the system robust and maintainable. 
+By adhering to DDD principles and defining these boundaries clearly, “jobops” can evolve new modes or swap AI providers without collapsing into a tangled, monolithic agent. Each context has a single responsibility and communicates via explicit contracts (events/APIs)【17†L92-L100】【17†L169-L174】, making the system robust and maintainable. 
 
-**Sources:** Career-Ops documentation and case study【19†L80-L89】【22†L725-L733】, principles of DDD and context mapping【17†L62-L70】【17†L92-L100】, plus actual feature descriptions (e.g. ATS resume generation【19†L123-L134】, pipeline tracking【18†L159-L160】). These informed the domain language and decomposition above.
+**Sources:** jobops documentation and case study【19†L80-L89】【22†L725-L733】, principles of DDD and context mapping【17†L62-L70】【17†L92-L100】, plus actual feature descriptions (e.g. ATS resume generation【19†L123-L134】, pipeline tracking【18†L159-L160】). These informed the domain language and decomposition above.
