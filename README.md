@@ -18,4 +18,4 @@ Contributions, ideas, and feedback are welcome. Open an issue or submit a pull r
 
 ## License
 
-Add a project license (for example, MIT) in a `LICENSE` file.
+License information will be added as the project matures.
